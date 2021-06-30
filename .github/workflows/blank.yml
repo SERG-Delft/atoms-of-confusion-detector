@@ -1,0 +1,20 @@
+name: Verification
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Compilation
+        run: | 
+          gradle assemble
+          gradle testClasses
+
+      - name: KtLint
+        run: gradle ktlintCheck
+        
+      - name: Detekt
+        run: gradle detekt
