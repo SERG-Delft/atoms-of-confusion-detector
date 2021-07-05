@@ -46,4 +46,28 @@ internal class MainKtTest {
         assertFalse { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
         assertFalse { Flags.VERBOSE }
     }
+
+    @Test
+    fun testVerboseExplicitName() {
+        main(arrayOf("myClass.java", "--verbose"))
+        assertTrue { Flags.VERBOSE }
+    }
+
+    @Test
+    fun testVerboseCapitalName() {
+        main(arrayOf("myClass.java", "-V"))
+        assertTrue { Flags.VERBOSE }
+    }
+
+    @Test
+    fun testRecursiveExplicitName() {
+        main(arrayOf("myClass.java", "--recursive"))
+        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
+    }
+
+    @Test
+    fun testRecursiveCapitalName() {
+        main(arrayOf("myClass.java", "-R"))
+        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
+    }
 }
