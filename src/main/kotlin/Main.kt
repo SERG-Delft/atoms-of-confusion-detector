@@ -1,3 +1,5 @@
+import input.MainCommand
+
 fun main(args: Array<String>) {
-    println(args)
+    MainCommand().main(args)
 }
