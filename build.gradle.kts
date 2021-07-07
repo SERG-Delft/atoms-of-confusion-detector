@@ -24,6 +24,18 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "MainKt"
+    }
+
+    from(
+        configurations.runtimeClasspath.get()
+            .onEach { println("add from dependencies: ${it.name}") }
+            .map { if (it.isDirectory) it else zipTree(it) }
+    )
+}
+
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }
