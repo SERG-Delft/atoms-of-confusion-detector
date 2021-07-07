@@ -30,8 +30,13 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
     override fun run() {
         Flags.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
         Flags.VERBOSE = verboseFlag
+
+        val classResolver = ClassResolver()
+
         sources.forEach { path ->
-            println(path)
+            classResolver.resolveClasses(path.toFile())
         }
+
+        classResolver.classes.forEach { println(it.path) }
     }
 }
