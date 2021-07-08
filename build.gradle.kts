@@ -17,6 +17,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.17.1")
+    implementation("com.github.ajalt.clikt:clikt:3.2.0")
 }
 
 tasks.test {
