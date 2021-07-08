@@ -1,5 +1,7 @@
-import input.MainCommand
+class Main {
 
-fun main(args: Array<String>) {
-    MainCommand().parse(args)
+    @Suppress("MemberNameEqualsClassName")
+    fun main(args: Array<String>) {
+        println(args)
+    }
 }
