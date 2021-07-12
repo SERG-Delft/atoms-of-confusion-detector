@@ -31,12 +31,10 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         Flags.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
         Flags.VERBOSE = verboseFlag
 
-        val classResolver = ClassResolver()
+        val classResolver = InputStreamResolver()
 
         sources.forEach { path ->
-            classResolver.resolveClasses(path.toFile())
+            classResolver.resolveStreamsFromFile(path.toFile())
         }
-
-        classResolver.classes.forEach { println(it.path) }
     }
 }
