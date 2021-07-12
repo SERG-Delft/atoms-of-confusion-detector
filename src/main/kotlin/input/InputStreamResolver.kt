@@ -1,10 +1,12 @@
 package input
 
+import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CharStreams
 import java.io.File
 
 class InputStreamResolver {
 
-    val streams = mutableListOf<InputStream>()
+    val streams = mutableListOf<CharStream>()
 
     /**
      * Resolves the classes in a directory
@@ -17,7 +19,7 @@ class InputStreamResolver {
         val children = dir.listFiles() ?: return
 
         children.forEach {
-            if (it.isFile) streams.add(InputStream(it.path))
+            if (it.isFile) streams.add(CharStreams.fromFileName(it.path))
             else if (it.isDirectory && recursive) resolveDir(it, true)
         }
     }
@@ -28,7 +30,7 @@ class InputStreamResolver {
      * @param file to a file/directory containing one or more java class
      */
     fun resolveStreamsFromFile(file: File) {
-        if (file.isFile) streams.add(InputStream(file.path))
+        if (file.isFile) streams.add(CharStreams.fromFileName(file.path))
         else if (file.isDirectory) resolveDir(file, recursive = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
     }
 }

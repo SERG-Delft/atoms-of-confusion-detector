@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import parsing.ParsedFile
 import java.nio.file.Path
 
 /**
@@ -33,8 +34,14 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
 
         val classResolver = InputStreamResolver()
 
+        sources.map { }
+
         sources.forEach { path ->
             classResolver.resolveStreamsFromFile(path.toFile())
         }
+
+        // for each input stream get its parser
+        val parsers = classResolver.streams.map { ParsedFile(it) }
+        parsers.forEach { println(it) }
     }
 }
