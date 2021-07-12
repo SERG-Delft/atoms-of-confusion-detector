@@ -2,9 +2,9 @@ package input
 
 import java.io.File
 
-class ClassResolver {
+class InputStreamResolver {
 
-    val classes = mutableListOf<File>()
+    val streams = mutableListOf<InputStream>()
 
     /**
      * Resolves the classes in a directory
@@ -17,7 +17,7 @@ class ClassResolver {
         val children = dir.listFiles() ?: return
 
         children.forEach {
-            if (it.isFile) classes.add(it)
+            if (it.isFile) streams.add(InputStream(it.path))
             else if (it.isDirectory && recursive) resolveDir(it, true)
         }
     }
@@ -25,10 +25,10 @@ class ClassResolver {
     /**
      * Resolves the classes given a file/directory
      *
-     * @param path to a file/directory containing one or more java class
+     * @param file to a file/directory containing one or more java class
      */
-    fun resolveClasses(path: File) {
-        if (path.isFile) classes.add(path)
-        else if (path.isDirectory) resolveDir(path, recursive = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
+    fun resolveStreamsFromFile(file: File) {
+        if (file.isFile) streams.add(InputStream(file.path))
+        else if (file.isDirectory) resolveDir(file, recursive = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
     }
 }
