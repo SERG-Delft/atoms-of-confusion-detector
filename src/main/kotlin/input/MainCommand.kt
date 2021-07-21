@@ -34,8 +34,6 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
 
         val classResolver = InputStreamResolver()
 
-        sources.map { }
-
         sources.forEach { path ->
             classResolver.resolveStreamsFromFile(path.toFile())
         }
