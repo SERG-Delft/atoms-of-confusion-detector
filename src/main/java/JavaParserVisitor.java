@@ -418,11 +418,124 @@ public interface JavaParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLocalTypeDeclaration(JavaParser.LocalTypeDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#statement}.
+	 * Visit a parse tree produced by the {@code statBlock}
+	 * labeled alternative in {@link JavaParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStatement(JavaParser.StatementContext ctx);
+	T visitStatBlock(JavaParser.StatBlockContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statAssert}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatAssert(JavaParser.StatAssertContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statIfElse}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatIfElse(JavaParser.StatIfElseContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statFor}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatFor(JavaParser.StatForContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statWhile}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatWhile(JavaParser.StatWhileContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statDoWhile}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatDoWhile(JavaParser.StatDoWhileContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statTry}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatTry(JavaParser.StatTryContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statTry2}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatTry2(JavaParser.StatTry2Context ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statSwitch}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatSwitch(JavaParser.StatSwitchContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statSync}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatSync(JavaParser.StatSyncContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statReturn}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatReturn(JavaParser.StatReturnContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statThrow}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatThrow(JavaParser.StatThrowContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statBreak}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatBreak(JavaParser.StatBreakContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statContinue}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatContinue(JavaParser.StatContinueContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statSemicolon}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatSemicolon(JavaParser.StatSemicolonContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statExpression}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatExpression(JavaParser.StatExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code statColon}
+	 * labeled alternative in {@link JavaParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatColon(JavaParser.StatColonContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#catchClause}.
 	 * @param ctx the parse tree
@@ -508,11 +621,166 @@ public interface JavaParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodCall(JavaParser.MethodCallContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#expression}.
+	 * Visit a parse tree produced by the {@code exprStaticFuncAccesor2}
+	 * labeled alternative in {@link JavaParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpression(JavaParser.ExpressionContext ctx);
+	T visitExprStaticFuncAccesor2(JavaParser.ExprStaticFuncAccesor2Context ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprStaticFuncAccessor1}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprStaticFuncAccessor1(JavaParser.ExprStaticFuncAccessor1Context ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprPostfix}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprPostfix(JavaParser.ExprPostfixContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprNewExpression}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprNewExpression(JavaParser.ExprNewExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprIdentifier}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprIdentifier(JavaParser.ExprIdentifierContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprTypeCast}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprTypeCast(JavaParser.ExprTypeCastContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprFuncAccesor}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprFuncAccesor(JavaParser.ExprFuncAccesorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprLiteral}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprLiteral(JavaParser.ExprLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprLambda}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprLambda(JavaParser.ExprLambdaContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprArrayAccess}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprArrayAccess(JavaParser.ExprArrayAccessContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprInfixBitshift}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprInfixBitshift(JavaParser.ExprInfixBitshiftContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprInstanceof}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprInstanceof(JavaParser.ExprInstanceofContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprSuper}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprSuper(JavaParser.ExprSuperContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprDotAccess}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprDotAccess(JavaParser.ExprDotAccessContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprParenthesized}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprParenthesized(JavaParser.ExprParenthesizedContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprPrefix}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprPrefix(JavaParser.ExprPrefixContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code typedMethodCall}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypedMethodCall(JavaParser.TypedMethodCallContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprMethodCall}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprMethodCall(JavaParser.ExprMethodCallContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprTernary}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprTernary(JavaParser.ExprTernaryContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprAssignment}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprAssignment(JavaParser.ExprAssignmentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprThis}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprThis(JavaParser.ExprThisContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprInfix}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprInfix(JavaParser.ExprInfixContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprClassAccess}
+	 * labeled alternative in {@link JavaParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprClassAccess(JavaParser.ExprClassAccessContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#lambdaExpression}.
 	 * @param ctx the parse tree
@@ -526,17 +794,19 @@ public interface JavaParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLambdaParameters(JavaParser.LambdaParametersContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#lambdaBody}.
+	 * Visit a parse tree produced by the {@code lambdaBodyExpr}
+	 * labeled alternative in {@link JavaParser#lambdaBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLambdaBody(JavaParser.LambdaBodyContext ctx);
+	T visitLambdaBodyExpr(JavaParser.LambdaBodyExprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#primary}.
+	 * Visit a parse tree produced by the {@code lambdaBodyBlock}
+	 * labeled alternative in {@link JavaParser#lambdaBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPrimary(JavaParser.PrimaryContext ctx);
+	T visitLambdaBodyBlock(JavaParser.LambdaBodyBlockContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#classType}.
 	 * @param ctx the parse tree

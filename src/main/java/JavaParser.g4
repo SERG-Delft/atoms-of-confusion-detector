@@ -385,27 +385,27 @@ localTypeDeclaration
     ;
 
 statement
-    : blockLabel=block
-    | ASSERT expression (':' expression)? ';'
-    | IF parExpression statement (ELSE statement)?
-    | FOR '(' forControl ')' statement
-    | WHILE parExpression statement
-    | DO statement WHILE parExpression ';'
-    | TRY block (catchClause+ finallyBlock? | finallyBlock)
-    | TRY resourceSpecification block catchClause* finallyBlock?
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-    | SYNCHRONIZED parExpression block
-    | RETURN expression? ';'
-    | THROW expression ';'
-    | BREAK IDENTIFIER? ';'
-    | CONTINUE IDENTIFIER? ';'
-    | SEMI
-    | statementExpression=expression ';'
-    | identifierLabel=IDENTIFIER ':' statement
+    : blockLabel=block                                                      #statBlock
+    | ASSERT expression (':' expression)? ';'                               #statAssert
+    | IF condition=parExpression body=statement (ELSE statement)?           #statIfElse
+    | FOR '(' forCtrl=forControl ')' body=statement                         #statFor
+    | WHILE condition=parExpression body=statement                          #statWhile
+    | DO body=statement WHILE condition=parExpression ';'                   #statDoWhile
+    | TRY body=block (catchClause+ finallyBlock? | finallyBlock)            #statTry
+    | TRY resourceSpecification body=block catchClause* finallyBlock?       #statTry2
+    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'  #statSwitch
+    | SYNCHRONIZED parExpression block                                      #statSync
+    | RETURN retunredExpr=expression? ';'                                   #statReturn
+    | THROW thrownException=expression ';'                                  #statThrow
+    | BREAK IDENTIFIER? ';'                                                 #statBreak
+    | CONTINUE IDENTIFIER? ';'                                              #statContinue
+    | SEMI                                                                  #statSemicolon
+    | statementExpression=expression ';'                                    #statExpression
+    | identifierLabel=IDENTIFIER ':' statement                              #statColon
     ;
 
 catchClause
-    : CATCH '(' variableModifier* catchType IDENTIFIER ')' block
+    : CATCH '(' variableModifier* catchType IDENTIFIER ')' body=block
     ;
 
 catchType
@@ -413,7 +413,7 @@ catchType
     ;
 
 finallyBlock
-    : FINALLY block
+    : FINALLY body=block
     ;
 
 resourceSpecification
@@ -442,7 +442,7 @@ switchLabel
 
 forControl
     : enhancedForControl
-    | forInit? ';' expression? ';' forUpdate=expressionList?
+    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList?
     ;
 
 forInit
@@ -451,13 +451,13 @@ forInit
     ;
 
 enhancedForControl
-    : variableModifier* typeType variableDeclaratorId ':' expression
+    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression
     ;
 
 // EXPRESSIONS
 
 parExpression
-    : '(' expression ')'
+    : '(' contents=expression ')'
     ;
 
 expressionList
@@ -465,14 +465,26 @@ expressionList
     ;
 
 methodCall
-    : IDENTIFIER '(' expressionList? ')'
-    | THIS '(' expressionList? ')'
-    | SUPER '(' expressionList? ')'
+    : IDENTIFIER '(' args=expressionList? ')'
+    | THIS '(' args=expressionList? ')'
+    | SUPER '(' args=expressionList? ')'
     ;
 
 expression
-    : primary
-    | expression bop='.'
+    : '(' contents=expression ')'       #exprParenthesized
+    | THIS                              #exprThis
+    | SUPER                             #exprSuper
+    | literal                           #exprLiteral
+    | IDENTIFIER                        #exprIdentifier
+    | typeTypeOrVoid '.' CLASS          #exprClassAccess
+
+    | nonWildcardTypeArguments
+      ( explicitGenericInvocationSuffix
+      | THIS arguments
+      )
+    #typedMethodCall
+
+    | caller=expression '.'
       ( IDENTIFIER
       | methodCall
       | THIS
@@ -480,34 +492,44 @@ expression
       | SUPER superSuffix
       | explicitGenericInvocation
       )
-    | expression '[' expression ']'
-    | methodCall
-    | NEW creator
-    | '(' annotation* typeType ')' expression
-    | expression postfix=('++' | '--')
-    | prefix=('+'|'-'|'++'|'--') expression
-    | prefix=('~'|'!') expression
-    | expression bop=('*'|'/'|'%') expression
-    | expression bop=('+'|'-') expression
-    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    | expression bop=('<=' | '>=' | '>' | '<') expression
-    | expression bop=INSTANCEOF typeType
-    | expression bop=('==' | '!=') expression
-    | expression bop='&' expression
-    | expression bop='^' expression
-    | expression bop='|' expression
-    | expression bop='&&' expression
-    | expression bop='||' expression
-    | <assoc=right> expression bop='?' expression ':' expression
-    | <assoc=right> expression
-      bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
-      expression
-    | lambdaExpression // Java8
+    #exprDotAccess
 
-    // Java 8 methodReference
-    | expression '::' typeArguments? IDENTIFIER
-    | typeType '::' (typeArguments? IDENTIFIER | NEW)
-    | classType '::' typeArguments? NEW
+    | expression '[' accessAddr=expression ']'                      #exprArrayAccess
+    | methodCall                                                    #exprMethodCall
+    | NEW creator                                                   #exprNewExpression
+    | '(' annotation* typeType ')' subexpr=expression               #exprTypeCast
+    | subexpr=expression postfix=('++' | '--')                      #exprPostfix
+    | prefix=('+'|'-'|'++'|'--') subexpr=expression                 #exprPrefix
+    | prefix=('~'|'!') subexpr=expression                           #exprPrefix
+    | l=expression op=('*'|'/'|'%') r=expression                    #exprInfix
+    | l=expression op=('+'|'-') r=expression                        #exprInfix
+    | l=expression ('<' '<' | '>' '>' '>' | '>' '>') r=expression   #exprInfixBitshift
+    | l=expression op=('<=' | '>=' | '>' | '<') r=expression        #exprInfix
+    | l=expression INSTANCEOF r=typeType                            #exprInstanceof
+    | l=expression op=('==' | '!=') r=expression                    #exprInfix
+    | l=expression op='&' r=expression                              #exprInfix
+    | l=expression op='^' r=expression                              #exprInfix
+    | l=expression op='|' r=expression                              #exprInfix
+    | l=expression op='&&' r=expression                             #exprInfix
+    | l=expression op='||' r=expression                             #exprInfix
+
+    | <assoc=right> condition=expression
+      '?' trueExpr=expression
+      ':' falseExpr=expression
+    #exprTernary
+
+    | <assoc=right> assignee=expression
+      ('=' | '+=' | '-=' | '*='
+      | '/=' | '&=' | '|=' | '^='
+      | '>>=' | '>>>=' | '<<=' | '%='
+      )
+      assigned=expression
+    #exprAssignment
+
+    | lambdaExpression                                  #exprLambda
+    | expression '::' typeArguments? IDENTIFIER         #exprFuncAccesor
+    | typeType '::' (typeArguments? IDENTIFIER | NEW)   #exprStaticFuncAccessor1
+    | classType '::' typeArguments? NEW                 #exprStaticFuncAccesor2
     ;
 
 // Java8
@@ -524,18 +546,8 @@ lambdaParameters
 
 // Java8
 lambdaBody
-    : expression
-    | block
-    ;
-
-primary
-    : '(' expression ')'
-    | THIS
-    | SUPER
-    | literal
-    | IDENTIFIER
-    | typeTypeOrVoid '.' CLASS
-    | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
+    : expression    #lambdaBodyExpr
+    | block         #lambdaBodyBlock
     ;
 
 classType
@@ -618,4 +630,3 @@ explicitGenericInvocationSuffix
 arguments
     : '(' expressionList? ')'
     ;
-
