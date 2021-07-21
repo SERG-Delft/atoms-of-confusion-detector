@@ -1,5 +1,5 @@
 import com.github.ajalt.clikt.core.MissingArgument
-import input.Flags
+import input.Settings
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
@@ -10,8 +10,8 @@ internal class MainKtTest {
 
     @BeforeEach
     fun setup() {
-        Flags.VERBOSE = false
-        Flags.RECURSIVELY_SEARCH_DIRECTORIES = false
+        Settings.VERBOSE = false
+        Settings.RECURSIVELY_SEARCH_DIRECTORIES = false
     }
 
     @Test
@@ -24,50 +24,50 @@ internal class MainKtTest {
     @Test
     fun testVerboseFlagGiven() {
         main(arrayOf("-v", "myClass.java"))
-        assertTrue { Flags.VERBOSE }
+        assertTrue { Settings.VERBOSE }
     }
 
     @Test
     fun testRecursiveFlagGiven() {
         main(arrayOf("-r", "myClass.java"))
-        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
+        assertTrue { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
     }
 
     @Test
     fun testVerboseAndRecursiveFlagsGiven() {
         main(arrayOf("-r", "-v", "myClass.java"))
-        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
-        assertTrue { Flags.VERBOSE }
+        assertTrue { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
+        assertTrue { Settings.VERBOSE }
     }
 
     @Test
     fun testNoFlagsGiven() {
         main(arrayOf("myclass.Java"))
-        assertFalse { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
-        assertFalse { Flags.VERBOSE }
+        assertFalse { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
+        assertFalse { Settings.VERBOSE }
     }
 
     @Test
     fun testVerboseExplicitName() {
         main(arrayOf("myClass.java", "--verbose"))
-        assertTrue { Flags.VERBOSE }
+        assertTrue { Settings.VERBOSE }
     }
 
     @Test
     fun testVerboseCapitalName() {
         main(arrayOf("myClass.java", "-V"))
-        assertTrue { Flags.VERBOSE }
+        assertTrue { Settings.VERBOSE }
     }
 
     @Test
     fun testRecursiveExplicitName() {
         main(arrayOf("myClass.java", "--recursive"))
-        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
+        assertTrue { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
     }
 
     @Test
     fun testRecursiveCapitalName() {
         main(arrayOf("myClass.java", "-R"))
-        assertTrue { Flags.RECURSIVELY_SEARCH_DIRECTORIES }
+        assertTrue { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
     }
 }

@@ -16,15 +16,15 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
     private val recursiveFlag by option(
         "-r", "--recursive", "-R",
         help = "This flag tells the tool to recursively search any input directory for Java files"
-    ).flag(default = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
+    ).flag(default = Settings.RECURSIVELY_SEARCH_DIRECTORIES)
     private val verboseFlag by option(
         "-v", "--verbose", "-V",
         help = "This flag tells the tool to print the results of its analysis on the console"
-    ).flag(default = Flags.VERBOSE)
+    ).flag(default = Settings.VERBOSE)
 
     override fun run() {
-        Flags.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
-        Flags.VERBOSE = verboseFlag
+        Settings.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
+        Settings.VERBOSE = verboseFlag
         sources.forEach {
             echo(it)
         }

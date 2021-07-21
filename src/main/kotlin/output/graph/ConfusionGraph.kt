@@ -91,9 +91,9 @@ class ConfusionGraph(val sources: List<String>) {
      * @param atom the Atom to find.
      * @return a list of Filename, Lines tuples.
      */
-    fun findAppearancesOfAtom(atom: Atom): List<Pair<String, Set<Int>>> {
+    fun findAppearancesOfAtom(atom: Atom): List<AtomInSourceAppearance> {
         val neighbours = atomNodes[atom.name]!!.edgeMap
-        return neighbours.keys.map { it -> Pair(it.name, neighbours[it]!!.lines) }
+        return neighbours.keys.map { it -> AtomInSourceAppearance(it.name, atom.name, neighbours[it]!!.lines) }
     }
 
     /**
@@ -103,10 +103,19 @@ class ConfusionGraph(val sources: List<String>) {
      * @throws SourceDoesNotExistException iff the source file given does not exist.
      * @return a list of Atom, Lines tuples.
      */
-    fun findAtomsInSource(source: String): List<Pair<String, Set<Int>>> {
+    fun findAtomsInSource(source: String): List<AtomInSourceAppearance> {
         if (!sourceNodes.contains(source)) throw SourceDoesNotExistException(source)
         val neighbours = sourceNodes[source]!!.edgeMap
-        return neighbours.keys.map { it -> Pair(it.name, neighbours[it]!!.lines) }
+        return neighbours.keys.map { it -> AtomInSourceAppearance(source, it.name, neighbours[it]!!.lines) }
+    }
+
+    /**
+     * Returns all appearances of all atoms
+     *
+     * @returns a list of lists representing all appearances.
+     */
+    fun getAllAtomAppearances(): List<List<Any>> {
+        return Atom.values().flatMap { it -> findAppearancesOfAtom(it).map { x -> x.toList() } }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -131,5 +140,11 @@ class ConfusionGraph(val sources: List<String>) {
 
     override fun toString(): String {
         return "ConfusionGraph(sources=$sources, atomNodes=$atomNodes, sourceNodes=$sourceNodes)"
+    }
+}
+
+data class AtomInSourceAppearance(val nameOfSource: String, val nameOfAtom: String, val lines: Set<Int>) {
+    fun toList(): List<Any> {
+        return listOf(nameOfAtom, nameOfSource, lines)
     }
 }

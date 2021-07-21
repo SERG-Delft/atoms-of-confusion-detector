@@ -87,7 +87,10 @@ internal class ConfusionGraphTest {
         val g1 = ConfusionGraph(listOf(sourceName, otherSource))
         g1.addAppearancesOfAtom(Atom.CHANGE_OF_LITERAL_ENCODING, sourceName, lines)
         g1.addAppearancesOfAtom(Atom.CHANGE_OF_LITERAL_ENCODING, otherSource, mutableSetOf(30, 42, 56))
-        val expected = listOf(Pair(sourceName, setOf(20, 55, 67)), Pair(otherSource, setOf(30, 42, 56)))
+        val expected = listOf(
+            AtomInSourceAppearance(sourceName, Atom.CHANGE_OF_LITERAL_ENCODING.name, setOf(20, 55, 67)),
+            AtomInSourceAppearance(otherSource, Atom.CHANGE_OF_LITERAL_ENCODING.name, setOf(30, 42, 56))
+        )
         val result = g1.findAppearancesOfAtom(Atom.CHANGE_OF_LITERAL_ENCODING)
         assertEquals(expected, result)
     }
@@ -98,8 +101,8 @@ internal class ConfusionGraphTest {
         g1.addAppearancesOfAtom(Atom.CHANGE_OF_LITERAL_ENCODING, sourceName, lines)
         g1.addAppearancesOfAtom(Atom.PRE_INCREMENT_DECREMENT, sourceName, mutableSetOf(30, 42, 56))
         val expected = listOf(
-            Pair(Atom.CHANGE_OF_LITERAL_ENCODING.name, setOf(20, 55, 67)),
-            Pair(Atom.PRE_INCREMENT_DECREMENT.name, setOf(30, 42, 56))
+            AtomInSourceAppearance(sourceName, Atom.CHANGE_OF_LITERAL_ENCODING.name, setOf(20, 55, 67)),
+            AtomInSourceAppearance(sourceName, Atom.PRE_INCREMENT_DECREMENT.name, setOf(30, 42, 56))
         )
         val result = g1.findAtomsInSource(sourceName)
         assertEquals(expected, result)
