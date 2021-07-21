@@ -1,5 +1,6 @@
 package input
 
+import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -16,32 +17,39 @@ class InputStreamResolverTest {
     @Test
     fun testResolveClass() {
         val inputResolver = InputStreamResolver()
-        val myClassStream = InputStream("testdata/myClass.java")
+        val myClassStream = CharStreams.fromFileName("testdata/myClass.java")
 
         val myClass = File("testdata/myClass.java")
         inputResolver.resolveStreamsFromFile(myClass)
-        assertEquals(inputResolver.streams, listOf(myClassStream))
+
+        val expected = listOf(myClassStream).map { it.toString() }
+        val actual = inputResolver.streams.map { it.toString() }
+        assertEquals(expected, actual)
     }
 
     @Test
     fun testResolveClassByDir() {
         val inputResolver = InputStreamResolver()
-        val myClass = InputStream("testdata/myClass.java")
-
+        val myClass = CharStreams.fromFileName("testdata/myClass.java")
         val parentDir = File("testdata/")
         inputResolver.resolveStreamsFromFile(parentDir)
-        assertEquals(inputResolver.streams, listOf(myClass))
+
+        val actual = inputResolver.streams.map { it.toString() }
+        val expected = listOf(myClass).map { it.toString() }
+        assertEquals(expected, actual)
     }
 
     @Test
     fun testResolveClassesRecursively() {
         Flags.RECURSIVELY_SEARCH_DIRECTORIES = true
         val inputResolver = InputStreamResolver()
-        val myClass = InputStream("testdata/myClass.java")
-        val nestedClass = InputStream("testdata/subdir/nestedClass.java")
-
+        val myClass = CharStreams.fromFileName("testdata/myClass.java")
+        val nestedClass = CharStreams.fromFileName("testdata/subdir/nestedClass.java")
         val parentDir = File("testdata/")
         inputResolver.resolveStreamsFromFile(parentDir)
-        assertEquals(inputResolver.streams, listOf(myClass, nestedClass))
+
+        val actual = inputResolver.streams.map { it.toString() }
+        val expected = listOf(myClass, nestedClass).map { it.toString() }
+        assertEquals(expected, actual)
     }
 }
