@@ -1,6 +1,7 @@
 package output.graph.nodes
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import output.exceptions.NotANeighbourException
@@ -16,8 +17,8 @@ internal class AtomNodeTest {
     fun testAddNeighbour() {
         val atomNode = AtomNode(atomName)
         val sourceNode = SourceNode(sourceName)
-        val edge = Edge(setOf<Int>(1, 20, 34), atomNode, sourceNode)
-        val expectedEdge = Edge(setOf<Int>(1, 20, 34), atomNode, sourceNode)
+        val edge = Edge(mutableSetOf<Int>(1, 20, 34), atomNode, sourceNode)
+        val expectedEdge = Edge(mutableSetOf<Int>(1, 20, 34), atomNode, sourceNode)
         atomNode.addNeighbour(sourceNode, edge)
         assertNotNull(atomNode.edgeMap[sourceNode])
         assertEquals(expectedEdge, atomNode.edgeMap[sourceNode])
@@ -28,7 +29,7 @@ internal class AtomNodeTest {
         val atomNode = AtomNode(atomName)
         val sourceNode = SourceNode(sourceName)
         assertThrows<SameTypeOfNodeAsNeighbourException> {
-            val edge = Edge(setOf<Int>(1, 20, 34), atomNode, sourceNode)
+            val edge = Edge(mutableSetOf<Int>(1, 20, 34), atomNode, sourceNode)
             atomNode.addNeighbour(atomNode, edge)
         }
     }
@@ -37,8 +38,8 @@ internal class AtomNodeTest {
     fun testGetEdgeToNeighbour() {
         val atomNode = AtomNode(atomName)
         val sourceNode = SourceNode(sourceName)
-        val edge = Edge(setOf<Int>(1, 20, 34), atomNode, sourceNode)
-        val expectedEdge = Edge(setOf<Int>(1, 20, 34), atomNode, sourceNode)
+        val edge = Edge(mutableSetOf<Int>(1, 20, 34), atomNode, sourceNode)
+        val expectedEdge = Edge(mutableSetOf<Int>(1, 20, 34), atomNode, sourceNode)
         atomNode.addNeighbour(sourceNode, edge)
         assertEquals(expectedEdge, atomNode.getEdgeToNeighbour(sourceNode))
     }
