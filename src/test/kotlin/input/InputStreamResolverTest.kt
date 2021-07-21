@@ -10,8 +10,8 @@ class InputStreamResolverTest {
 
     @BeforeEach
     fun setup() {
-        Flags.RECURSIVELY_SEARCH_DIRECTORIES = false
-        Flags.VERBOSE = false
+        Settings.RECURSIVELY_SEARCH_DIRECTORIES = false
+        Settings.VERBOSE = false
     }
 
     @Test
@@ -41,7 +41,7 @@ class InputStreamResolverTest {
 
     @Test
     fun testResolveClassesRecursively() {
-        Flags.RECURSIVELY_SEARCH_DIRECTORIES = true
+        Settings.RECURSIVELY_SEARCH_DIRECTORIES = true
         val inputResolver = InputStreamResolver()
         val myClass = CharStreams.fromFileName("testdata/myClass.java")
         val nestedClass = CharStreams.fromFileName("testdata/subdir/nestedClass.java")
