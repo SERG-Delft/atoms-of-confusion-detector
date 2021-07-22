@@ -31,6 +31,6 @@ class InputStreamResolver {
      */
     fun resolveStreamsFromFile(file: File) {
         if (file.isFile) streams.add(CharStreams.fromFileName(file.path))
-        else if (file.isDirectory) resolveDir(file, recursive = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
+        else if (file.isDirectory) resolveDir(file, recursive = Settings.RECURSIVELY_SEARCH_DIRECTORIES)
     }
 }

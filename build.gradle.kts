@@ -19,6 +19,7 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.17.1")
     implementation("com.github.ajalt.clikt:clikt:3.2.0")
     implementation("org.antlr:antlr4-runtime:4.9.2")
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2")
 }
 
 tasks.test {
