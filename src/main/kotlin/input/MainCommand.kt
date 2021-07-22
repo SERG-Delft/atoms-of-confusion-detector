@@ -6,6 +6,9 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import output.graph.ConfusionGraph
+import output.writers.CsvWriter
+import parsing.AtomsVisitor
 import parsing.ParsedFile
 import java.nio.file.Path
 
@@ -38,8 +41,14 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
             classResolver.resolveStreamsFromFile(path.toFile())
         }
 
+        val confusionGraph = ConfusionGraph(sources.map { it -> it.toString() })
+
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
-        parsers.forEach { println(it) }
+        parsers.forEach {
+            val tree = it.parser.compilationUnit()
+            tree.accept(AtomsVisitor(confusionGraph, it.stream.sourceName))
+        }
+        CsvWriter.outputData(confusionGraph)
     }
 }
