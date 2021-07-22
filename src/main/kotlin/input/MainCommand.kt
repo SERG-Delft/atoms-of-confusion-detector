@@ -1,5 +1,6 @@
 package input
 
+import JavaParser
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
@@ -10,6 +11,7 @@ import output.graph.ConfusionGraph
 import output.writers.CsvWriter
 import parsing.AtomsVisitor
 import parsing.ParsedFile
+import parsing.detectors.LogicAsControlFlowDetector
 import java.nio.file.Path
 
 /**
@@ -41,14 +43,31 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
             classResolver.resolveStreamsFromFile(path.toFile())
         }
 
-        val confusionGraph = ConfusionGraph(sources.map { it -> it.toString() })
+        val confusionGraph = ConfusionGraph(sources.map { it.toString() })
+        val visitor = AtomsVisitor()
+        visitor.registerDetector(
+            LogicAsControlFlowDetector(visitor, confusionGraph),
+            JavaParser.ExprInfixContext::class
+        )
+        visitor.registerDetector(
+            LogicAsControlFlowDetector(visitor, confusionGraph),
+            JavaParser.ExprPrefixContext::class
+        )
+        visitor.registerDetector(
+            LogicAsControlFlowDetector(visitor, confusionGraph),
+            JavaParser.ExprPostfixContext::class
+        )
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
         parsers.forEach {
+
+            visitor.fileName = it.stream.sourceName
+
             val tree = it.parser.compilationUnit()
-            tree.accept(AtomsVisitor(confusionGraph, it.stream.sourceName))
+            tree.accept(visitor)
         }
+
         CsvWriter.outputData(confusionGraph)
     }
 }
