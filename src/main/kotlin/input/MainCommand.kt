@@ -6,6 +6,10 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import output.graph.ConfusionGraph
+import output.writers.CsvWriter
+import parsing.AtomsVisitor
+import parsing.ParsedFile
 import java.nio.file.Path
 
 /**
@@ -17,26 +21,34 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
     private val recursiveFlag by option(
         "-r", "--recursive", "-R",
         help = "This flag tells the tool to recursively search any input directory for Java files"
-    ).flag(default = Flags.RECURSIVELY_SEARCH_DIRECTORIES)
+    ).flag(default = Settings.RECURSIVELY_SEARCH_DIRECTORIES)
     private val verboseFlag by option(
         "-v", "--verbose", "-V",
         help = "This flag tells the tool to print the results of its analysis on the console"
-    ).flag(default = Flags.VERBOSE)
+    ).flag(default = Settings.VERBOSE)
 
     private val sources: List<Path> by argument()
         .path(mustExist = true, mustBeReadable = true)
         .multiple(required = true)
 
     override fun run() {
-        Flags.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
-        Flags.VERBOSE = verboseFlag
+        Settings.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
+        Settings.VERBOSE = verboseFlag
 
-        val classResolver = ClassResolver()
+        val classResolver = InputStreamResolver()
 
         sources.forEach { path ->
-            classResolver.resolveClasses(path.toFile())
+            classResolver.resolveStreamsFromFile(path.toFile())
         }
 
-        classResolver.classes.forEach { println(it.path) }
+        val confusionGraph = ConfusionGraph(sources.map { it -> it.toString() })
+
+        // for each input stream get its parser
+        val parsers = classResolver.streams.map { ParsedFile(it) }
+        parsers.forEach {
+            val tree = it.parser.compilationUnit()
+            tree.accept(AtomsVisitor(confusionGraph, it.stream.sourceName))
+        }
+        CsvWriter.outputData(confusionGraph)
     }
 }
