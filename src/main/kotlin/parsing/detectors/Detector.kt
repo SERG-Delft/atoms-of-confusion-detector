@@ -5,4 +5,5 @@ interface Detector {
     fun detect(ctx: JavaParser.ExprPrefixContext)
     fun detect(ctx: JavaParser.ExprPostfixContext)
     fun detect(ctx: JavaParser.ExprTernaryContext)
+    fun detect(ctx: JavaParser.ExprAssignmentContext)
 }
