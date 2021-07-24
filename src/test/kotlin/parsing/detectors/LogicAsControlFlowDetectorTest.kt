@@ -1,39 +1,14 @@
 package parsing.detectors
 
-import org.antlr.v4.runtime.CharStreams
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
-import parsing.ParsedFile
 import kotlin.test.assertEquals
 
-internal class LogicAsControlFlowDetectorTest {
+internal class LogicAsControlFlowDetectorTest : DetectorTest() {
 
-    private fun parse(code: String): Triple<AtomsVisitor, ConfusionGraph, ParsedFile> {
-
-        // set up visitor, graph and detector
-        val v = AtomsVisitor(); v.fileName = "f1"
-        val g = ConfusionGraph(listOf("f1"))
-        val d = LogicAsControlFlowDetector(v, g)
-
-        // register detector
-        v.registerDetector(d)
-
-        val file = ParsedFile(CharStreams.fromString(code))
-
-        return Triple(v, g, file)
-    }
-
-    private fun runVisitorExpr(code: String): List<List<Any>> {
-        val (v, g, file) = parse(code)
-        file.parser.expression().accept(v)
-        return g.getAllAtomAppearances()
-    }
-
-    private fun runVisitorFile(code: String): List<List<Any>> {
-        val (v, g, file) = parse(code)
-        file.parser.compilationUnit().accept(v)
-        return g.getAllAtomAppearances()
+    @BeforeEach
+    fun setup() {
+        this.detector = LogicAsControlFlowDetector(this.visitor, this.graph)
     }
 
     @Test
