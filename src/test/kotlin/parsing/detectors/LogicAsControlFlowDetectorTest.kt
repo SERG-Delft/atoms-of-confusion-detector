@@ -1,6 +1,5 @@
 package parsing.detectors
 
-import JavaParser
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Test
 import output.graph.ConfusionGraph
@@ -18,9 +17,7 @@ internal class LogicAsControlFlowDetectorTest {
         val d = LogicAsControlFlowDetector(v, g)
 
         // register detector
-        v.registerDetector(d, JavaParser.ExprInfixContext::class)
-        v.registerDetector(d, JavaParser.ExprPostfixContext::class)
-        v.registerDetector(d, JavaParser.ExprPrefixContext::class)
+        v.registerDetector(d)
 
         val file = ParsedFile(CharStreams.fromString(code))
 

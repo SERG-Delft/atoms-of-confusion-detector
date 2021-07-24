@@ -1,6 +1,5 @@
 package input
 
-import JavaParser
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
@@ -46,18 +45,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         val confusionGraph = ConfusionGraph(sources.map { it.toString() })
         val visitor = AtomsVisitor()
 
-        visitor.registerDetector(
-            LogicAsControlFlowDetector(visitor, confusionGraph),
-            JavaParser.ExprInfixContext::class
-        )
-        visitor.registerDetector(
-            LogicAsControlFlowDetector(visitor, confusionGraph),
-            JavaParser.ExprPrefixContext::class
-        )
-        visitor.registerDetector(
-            LogicAsControlFlowDetector(visitor, confusionGraph),
-            JavaParser.ExprPostfixContext::class
-        )
+        visitor.registerDetector(LogicAsControlFlowDetector(visitor, confusionGraph))
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }

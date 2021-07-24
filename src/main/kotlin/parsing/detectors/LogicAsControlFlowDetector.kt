@@ -5,8 +5,8 @@ import output.Atom
 import output.graph.ConfusionGraph
 import parsing.AtomsVisitor
 
-class LogicAsControlFlowDetector(override val visitor: AtomsVisitor, override val graph: ConfusionGraph) :
-    BaseDetector(visitor, graph) {
+@Visit(JavaParser.ExprPrefixContext::class, JavaParser.ExprInfixContext::class, JavaParser.ExprPostfixContext::class)
+class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : BaseDetector(visitor, graph) {
 
     private var insideShortCircuitRight = false
 

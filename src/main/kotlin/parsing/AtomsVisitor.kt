@@ -3,7 +3,9 @@ package parsing
 import JavaParser
 import JavaParserBaseVisitor
 import parsing.detectors.Detector
+import parsing.detectors.Visit
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
 
 class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
 
@@ -11,10 +13,15 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
 
-    fun registerDetector(detector: Detector, type: KClass<*>) {
+    fun registerDetector(detector: Detector) {
 
-        if (callbacksMap[type] == null) callbacksMap[type] = mutableListOf()
-        callbacksMap[type]!!.add(detector)
+        val annotation = detector::class.findAnnotation<Visit>() ?: return
+
+        // register the detector for each type
+        annotation.types.forEach {
+            if (callbacksMap[it] == null) callbacksMap[it] = mutableListOf()
+            callbacksMap[it]!!.add(detector)
+        }
     }
 
     override fun visitExprPostfix(ctx: JavaParser.ExprPostfixContext) =
