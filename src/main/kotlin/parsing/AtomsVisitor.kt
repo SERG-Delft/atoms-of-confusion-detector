@@ -25,38 +25,22 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
     }
 
     override fun visitExprPostfix(ctx: JavaParser.ExprPostfixContext) {
-        val detectors = callbacksMap[ctx::class]
-        if (detectors == null) {
-            visitChildren(ctx)
-        } else {
-            detectors.forEach { it.detect(ctx) }
-        }
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
     }
 
     override fun visitExprPrefix(ctx: JavaParser.ExprPrefixContext) {
-        val detectors = callbacksMap[ctx::class]
-        if (detectors == null) {
-            visitChildren(ctx)
-        } else {
-            detectors.forEach { it.detect(ctx) }
-        }
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
     }
 
     override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) {
-        val detectors = callbacksMap[ctx::class]
-        if (detectors == null) {
-            visitChildren(ctx)
-        } else {
-            detectors.forEach { it.detect(ctx) }
-        }
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
     }
 
     override fun visitExprTernary(ctx: JavaParser.ExprTernaryContext) {
-        val detectors = callbacksMap[ctx::class]
-        if (detectors == null) {
-            visitChildren(ctx)
-        } else {
-            detectors.forEach { it.detect(ctx) }
-        }
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
     }
 }

@@ -15,6 +15,5 @@ class PostIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGrap
         ) {
             graph.addAppearancesOfAtom(Atom.POST_INCREMENT_DECREMENT, visitor.fileName, mutableSetOf(ctx.start.line))
         }
-        super.detect(ctx)
     }
 }

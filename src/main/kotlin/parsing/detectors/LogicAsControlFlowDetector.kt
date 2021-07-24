@@ -24,7 +24,6 @@ class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) :
             visitor.fileName,
             mutableSetOf(line)
         )
-        super.detect(ctx)
     }
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
@@ -34,6 +33,5 @@ class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) :
             visitor.fileName,
             mutableSetOf(line)
         )
-        super.detect(ctx)
     }
 }

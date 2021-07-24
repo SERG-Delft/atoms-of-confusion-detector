@@ -15,6 +15,5 @@ class PreIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGraph
         ) {
             graph.addAppearancesOfAtom(Atom.PRE_INCREMENT_DECREMENT, visitor.fileName, mutableSetOf(ctx.start.line))
         }
-        super.detect(ctx)
     }
 }
