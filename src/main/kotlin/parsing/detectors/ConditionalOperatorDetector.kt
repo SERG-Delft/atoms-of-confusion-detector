@@ -9,6 +9,6 @@ class ConditionalOperatorDetector(visitor: AtomsVisitor, graph: ConfusionGraph) 
 
     override fun detect(ctx: JavaParser.ExprTernaryContext) {
         graph.addAppearancesOfAtom(Atom.CONDITIONAL_OPERATOR, visitor.fileName, mutableSetOf(ctx.start.line))
-        visitor.visitChildren(ctx)
+        super.detect(ctx)
     }
 }
