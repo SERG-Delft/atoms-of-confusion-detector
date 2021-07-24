@@ -1,5 +1,6 @@
 package parsing.detectors
 
+import JavaParser
 import output.graph.ConfusionGraph
 import parsing.AtomsVisitor
 

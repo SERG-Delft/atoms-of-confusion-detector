@@ -45,6 +45,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
 
         val confusionGraph = ConfusionGraph(sources.map { it.toString() })
         val visitor = AtomsVisitor()
+
         visitor.registerDetector(
             LogicAsControlFlowDetector(visitor, confusionGraph),
             JavaParser.ExprInfixContext::class

@@ -12,6 +12,7 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
 
     fun registerDetector(detector: Detector, type: KClass<*>) {
+
         if (callbacksMap[type] == null) callbacksMap[type] = mutableListOf()
         callbacksMap[type]!!.add(detector)
     }
