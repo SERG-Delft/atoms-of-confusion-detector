@@ -9,4 +9,5 @@ abstract class BaseDetector(open val visitor: AtomsVisitor, open val graph: Conf
     override fun detect(ctx: JavaParser.ExprInfixContext) {}
     override fun detect(ctx: JavaParser.ExprPrefixContext) {}
     override fun detect(ctx: JavaParser.ExprPostfixContext) {}
+    override fun detect(ctx: JavaParser.ExprTernaryContext) {}
 }
