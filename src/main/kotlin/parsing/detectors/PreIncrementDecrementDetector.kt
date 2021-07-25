@@ -5,7 +5,7 @@ import output.graph.ConfusionGraph
 import parsing.AtomsVisitor
 
 @Visit(JavaParser.ExprPrefixContext::class)
-class PreIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : BaseDetector(visitor, graph) {
+class PreIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : Detector(visitor, graph) {
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
         val parent = ctx.parent

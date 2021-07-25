@@ -34,6 +34,16 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
         visitChildren(ctx)
     }
 
+    override fun visitExprInstanceof(ctx: JavaParser.ExprInstanceofContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
+
+    override fun visitExprInfixBitshift(ctx: JavaParser.ExprInfixBitshiftContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
+
     override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
         visitChildren(ctx)

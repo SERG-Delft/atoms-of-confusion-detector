@@ -4,7 +4,7 @@ import JavaParser
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Test
 import output.graph.ConfusionGraph
-import parsing.detectors.BaseDetector
+import parsing.detectors.Detector
 import parsing.detectors.Visit
 import kotlin.test.assertEquals
 
@@ -20,7 +20,7 @@ internal class AtomsVisitorTest {
         v.fileName = "f1"
 
         val detector = @Visit(JavaParser.ExprInfixContext::class, JavaParser.ExprPostfixContext::class)
-        object : BaseDetector(v, g) {
+        object : Detector(v, g) {
 
             private var insideSCR = false
 

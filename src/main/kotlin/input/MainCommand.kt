@@ -11,6 +11,7 @@ import output.writers.CsvWriter
 import parsing.AtomsVisitor
 import parsing.ParsedFile
 import parsing.detectors.ConditionalOperatorDetector
+import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
@@ -49,6 +50,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         val visitor = AtomsVisitor()
 
         visitor.registerDetector(LogicAsControlFlowDetector(visitor, confusionGraph))
+        visitor.registerDetector(InfixPrecedenceDetector(visitor, confusionGraph))
         visitor.registerDetector(ConditionalOperatorDetector(visitor, confusionGraph))
         visitor.registerDetector(PostIncrementDecrementDetector(visitor, confusionGraph))
         visitor.registerDetector(PreIncrementDecrementDetector(visitor, confusionGraph))
