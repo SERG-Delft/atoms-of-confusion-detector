@@ -24,18 +24,33 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
         }
     }
 
-    override fun visitExprPostfix(ctx: JavaParser.ExprPostfixContext) =
+    override fun visitExprPostfix(ctx: JavaParser.ExprPostfixContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 
-    override fun visitExprPrefix(ctx: JavaParser.ExprPrefixContext) =
+    override fun visitExprPrefix(ctx: JavaParser.ExprPrefixContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 
-    override fun visitExprInstanceof(ctx: JavaParser.ExprInstanceofContext) =
+    override fun visitExprInstanceof(ctx: JavaParser.ExprInstanceofContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 
-    override fun visitExprInfixBitshift(ctx: JavaParser.ExprInfixBitshiftContext) =
+    override fun visitExprInfixBitshift(ctx: JavaParser.ExprInfixBitshiftContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 
-    override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) =
+    override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
+
+    override fun visitExprTernary(ctx: JavaParser.ExprTernaryContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 }

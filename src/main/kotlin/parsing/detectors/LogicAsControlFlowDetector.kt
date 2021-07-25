@@ -6,7 +6,7 @@ import output.graph.ConfusionGraph
 import parsing.AtomsVisitor
 
 @Visit(JavaParser.ExprPrefixContext::class, JavaParser.ExprInfixContext::class, JavaParser.ExprPostfixContext::class)
-class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : BaseDetector(visitor, graph) {
+class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : Detector(visitor, graph) {
 
     private var insideShortCircuitRight = false
 
@@ -24,7 +24,6 @@ class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) :
             visitor.fileName,
             mutableSetOf(line)
         )
-        visitor.visitChildren(ctx)
     }
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
@@ -34,6 +33,5 @@ class LogicAsControlFlowDetector(visitor: AtomsVisitor, graph: ConfusionGraph) :
             visitor.fileName,
             mutableSetOf(line)
         )
-        visitor.visitChildren(ctx)
     }
 }

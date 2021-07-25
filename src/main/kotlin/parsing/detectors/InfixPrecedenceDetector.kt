@@ -12,7 +12,7 @@ import parsing.exceptions.NotInfixException
     JavaParser.ExprInstanceofContext::class,
     JavaParser.ExprInfixBitshiftContext::class
 )
-class InfixPrecedenceDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : BaseDetector(visitor, graph) {
+class InfixPrecedenceDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : Detector(visitor, graph) {
 
     @SuppressWarnings("MagicNumber")
     private val infixPrecedence = mutableMapOf(
