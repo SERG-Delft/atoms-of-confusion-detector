@@ -1,58 +1,37 @@
 package parsing.detectors
 
-import org.antlr.v4.runtime.CharStreams
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
-import parsing.ParsedFile
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-internal class InfixPrecedenceDetectorTest {
+internal class InfixPrecedenceDetectorTest : DetectorTest() {
 
-    private fun parse(code: String): Triple<AtomsVisitor, ConfusionGraph, ParsedFile> {
-
-        // set up visitor, graph and detector
-        val v = AtomsVisitor(); v.fileName = "f1"
-        val g = ConfusionGraph(listOf("f1"))
-        val d = InfixPrecedenceDetector(v, g)
-
-        // register detector
-        v.registerDetector(d)
-
-        val file = ParsedFile(CharStreams.fromString(code))
-
-        return Triple(v, g, file)
+    @BeforeEach
+    fun setup() {
+        this.detector = InfixPrecedenceDetector(this.visitor, this.graph)
     }
 
-    private fun runVisitorExpr(code: String): List<List<Any>> {
-        val (v, g, file) = parse(code)
-        file.parser.expression().accept(v)
-        return g.getAllAtomAppearances()
+    private fun assertAtom(atoms: List<List<Any>>) {
+        kotlin.test.assertEquals(1, atoms.size)
+        kotlin.test.assertEquals("INFIX_OPERATOR_PRECEDENCE", atoms[0][0])
     }
 
     @Test
     fun testPresent() {
         val atoms = runVisitorExpr("1 + 1/2")
-
-        assertEquals(1, atoms.size)
-        assertEquals("INFIX_OPERATOR_PRECEDENCE", atoms[0][0])
+        assertAtom(atoms)
     }
 
     @Test
     fun testInstanceof() {
         val atoms = runVisitorExpr("1 * 2 instanceof String")
-
-        assertEquals(1, atoms.size)
-        assertEquals("INFIX_OPERATOR_PRECEDENCE", atoms[0][0])
+        assertAtom(atoms)
     }
 
     @Test
     fun testBitshift() {
         val atoms = runVisitorExpr("1 * 2 >>> 1")
-
-        assertEquals(1, atoms.size)
-        assertEquals("INFIX_OPERATOR_PRECEDENCE", atoms[0][0])
+        assertAtom(atoms)
     }
 
     @Test
