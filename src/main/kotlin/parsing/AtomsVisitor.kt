@@ -30,5 +30,12 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
     override fun visitExprPrefix(ctx: JavaParser.ExprPrefixContext) =
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
 
-    override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) = callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    override fun visitExprInstanceof(ctx: JavaParser.ExprInstanceofContext) =
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+
+    override fun visitExprInfixBitshift(ctx: JavaParser.ExprInfixBitshiftContext) =
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+
+    override fun visitExprInfix(ctx: JavaParser.ExprInfixContext) =
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
 }

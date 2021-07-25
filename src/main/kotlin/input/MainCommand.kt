@@ -10,6 +10,7 @@ import output.graph.ConfusionGraph
 import output.writers.CsvWriter
 import parsing.AtomsVisitor
 import parsing.ParsedFile
+import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
 import java.nio.file.Path
 
@@ -46,6 +47,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         val visitor = AtomsVisitor()
 
         visitor.registerDetector(LogicAsControlFlowDetector(visitor, confusionGraph))
+        visitor.registerDetector(InfixPrecedenceDetector(visitor, confusionGraph))
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
