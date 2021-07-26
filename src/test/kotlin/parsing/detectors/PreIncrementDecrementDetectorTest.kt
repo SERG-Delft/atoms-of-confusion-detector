@@ -14,49 +14,49 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
     fun testBasicIncrement() {
         val code = "b = ++a"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testWithArithmetic() {
         val code = "v2 = 3 + ++v1"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testIncrementInConditional() {
         val code = "++v1 == 0"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testBasicDecrement() {
         val code = "b = --a"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testWithArithmeticDecrement() {
         val code = "v2 = 3 + --v1"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testDecrementInConditional() {
         val code = "--v1 == 0"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testInClass() {
         val code = "class A { int a = 23; int b = ++a; public void foo() {} }"
         val atoms = runVisitorFile(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
     }
 
     @Test
@@ -71,10 +71,5 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
         val code = "for (int i = 0; i < 10; ++i) {}"
         val atoms = runVisitorExpr(code)
         kotlin.test.assertEquals(0, atoms.size)
-    }
-
-    private fun assertAtom(atoms: List<List<Any>>) {
-        kotlin.test.assertEquals(1, atoms.size)
-        kotlin.test.assertEquals("PRE_INCREMENT_DECREMENT", atoms[0][0])
     }
 }

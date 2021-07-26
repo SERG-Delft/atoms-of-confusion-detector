@@ -53,4 +53,9 @@ class AtomsVisitor : JavaParserBaseVisitor<Unit>() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
         visitChildren(ctx)
     }
+
+    override fun visitExprAssignment(ctx: JavaParser.ExprAssignmentContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+        visitChildren(ctx)
+    }
 }

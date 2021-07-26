@@ -14,15 +14,13 @@ internal class ConditionalOperatorDetectorTest : DetectorTest() {
     @Test
     fun testBasic() {
         val atoms = runVisitorExpr("(3 > 2) ? 4 : 5")
-        assertEquals(1, atoms.size)
-        assertEquals("CONDITIONAL_OPERATOR", atoms[0][0])
+        assertAtom(atoms, "CONDITIONAL_OPERATOR")
     }
 
     @Test
     fun testInClass() {
         val atoms = runVisitorFile("class A { void f() {int a = (3 > 2) ? 4 : 5;} }")
-        assertEquals(1, atoms.size)
-        assertEquals("CONDITIONAL_OPERATOR", atoms[0][0])
+        assertAtom(atoms, "CONDITIONAL_OPERATOR")
     }
 
     @Test

@@ -11,27 +11,22 @@ internal class InfixPrecedenceDetectorTest : DetectorTest() {
         this.detector = InfixPrecedenceDetector(this.visitor, this.graph)
     }
 
-    private fun assertAtom(atoms: List<List<Any>>) {
-        kotlin.test.assertEquals(1, atoms.size)
-        kotlin.test.assertEquals("INFIX_OPERATOR_PRECEDENCE", atoms[0][0])
-    }
-
     @Test
     fun testPresent() {
         val atoms = runVisitorExpr("1 + 1/2")
-        assertAtom(atoms)
+        assertAtom(atoms, "INFIX_OPERATOR_PRECEDENCE")
     }
 
     @Test
     fun testInstanceof() {
         val atoms = runVisitorExpr("1 * 2 instanceof String")
-        assertAtom(atoms)
+        assertAtom(atoms, "INFIX_OPERATOR_PRECEDENCE")
     }
 
     @Test
     fun testBitshift() {
         val atoms = runVisitorExpr("1 * 2 >>> 1")
-        assertAtom(atoms)
+        assertAtom(atoms, "INFIX_OPERATOR_PRECEDENCE")
     }
 
     @Test

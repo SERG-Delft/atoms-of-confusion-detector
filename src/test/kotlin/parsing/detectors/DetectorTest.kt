@@ -36,4 +36,9 @@ open class DetectorTest {
         file.parser.compilationUnit().accept(v)
         return g.getAllAtomAppearances()
     }
+
+    protected fun assertAtom(atoms: List<List<Any>>, expectedAtomName: String) {
+        kotlin.test.assertEquals(1, atoms.size)
+        kotlin.test.assertEquals(expectedAtomName, atoms[0][0])
+    }
 }
