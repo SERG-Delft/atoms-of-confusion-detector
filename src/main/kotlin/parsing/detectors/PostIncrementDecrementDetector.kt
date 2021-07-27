@@ -2,10 +2,10 @@ package parsing.detectors
 
 import output.Atom
 import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
+import parsing.AtomsListener
 
 @Visit(JavaParser.ExprPostfixContext::class)
-class PostIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : Detector(visitor, graph) {
+class PostIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
 
     override fun detect(ctx: JavaParser.ExprPostfixContext) {
         val parent = ctx.parent
@@ -13,7 +13,7 @@ class PostIncrementDecrementDetector(visitor: AtomsVisitor, graph: ConfusionGrap
             parent !is JavaParser.ExpressionListContext &&
             parent != null
         ) {
-            graph.addAppearancesOfAtom(Atom.POST_INCREMENT_DECREMENT, visitor.fileName, mutableSetOf(ctx.start.line))
+            graph.addAppearancesOfAtom(Atom.POST_INCREMENT_DECREMENT, listener.fileName, mutableSetOf(ctx.start.line))
         }
     }
 }

@@ -4,7 +4,7 @@ import JavaParser
 import org.antlr.v4.runtime.ParserRuleContext
 import output.Atom
 import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
+import parsing.AtomsListener
 import parsing.exceptions.NotInfixException
 
 @Visit(
@@ -12,7 +12,7 @@ import parsing.exceptions.NotInfixException
     JavaParser.ExprInstanceofContext::class,
     JavaParser.ExprInfixBitshiftContext::class
 )
-class InfixPrecedenceDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : Detector(visitor, graph) {
+class InfixPrecedenceDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
 
     @SuppressWarnings("MagicNumber")
     private val infixPrecedence = mutableMapOf(
@@ -78,28 +78,25 @@ class InfixPrecedenceDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : De
         val isConfusing = checkPrecedence(ctx, ctx.l) || checkPrecedence(ctx, ctx.r)
         if (isConfusing) graph.addAppearancesOfAtom(
             Atom.INFIX_OPERATOR_PRECEDENCE,
-            visitor.fileName,
+            listener.fileName,
             mutableSetOf(ctx.start.line)
         )
-        visitor.visitChildren(ctx)
     }
 
     override fun detect(ctx: JavaParser.ExprInfixBitshiftContext) {
         val isConfusing = checkPrecedence(ctx, ctx.l) || checkPrecedence(ctx, ctx.r)
         if (isConfusing) graph.addAppearancesOfAtom(
             Atom.INFIX_OPERATOR_PRECEDENCE,
-            visitor.fileName,
+            listener.fileName,
             mutableSetOf(ctx.start.line)
         )
-        visitor.visitChildren(ctx)
     }
 
     override fun detect(ctx: JavaParser.ExprInstanceofContext) {
         if (checkPrecedence(ctx, ctx.l)) graph.addAppearancesOfAtom(
             Atom.INFIX_OPERATOR_PRECEDENCE,
-            visitor.fileName,
+            listener.fileName,
             mutableSetOf(ctx.start.line)
         )
-        visitor.visitChildren(ctx)
     }
 }
