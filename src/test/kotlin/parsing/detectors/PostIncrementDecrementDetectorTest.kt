@@ -8,56 +8,56 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = PostIncrementDecrementDetector(this.visitor, this.graph)
+        this.detector = PostIncrementDecrementDetector(this.listener, this.graph)
     }
 
     @Test
     fun testBasicIncrement() {
         val code = "b = a++"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testWithArithmetic() {
         val code = "v2 = 3 + v1++"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testIncrementInConditional() {
         val code = "v1++ == 0"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testBasicDecrement() {
         val code = "b = a--"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testWithArithmeticDecrement() {
         val code = "v2 = 3 + v1--"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testDecrementInConditional() {
         val code = "v1-- == 0"
         val atoms = runVisitorExpr(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
     fun testInClass() {
         val code = "class A { int a = 23; int b = a++; public void foo() {} }"
         val atoms = runVisitorFile(code)
-        assertAtom(atoms)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
     }
 
     @Test
@@ -72,10 +72,5 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
         val code = "for (int i = 0; i < 10; i++) {}"
         val atoms = runVisitorExpr(code)
         assertEquals(0, atoms.size)
-    }
-
-    private fun assertAtom(atoms: List<List<Any>>) {
-        kotlin.test.assertEquals(1, atoms.size)
-        kotlin.test.assertEquals("POST_INCREMENT_DECREMENT", atoms[0][0])
     }
 }

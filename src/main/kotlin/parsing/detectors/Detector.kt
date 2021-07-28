@@ -1,9 +1,9 @@
 package parsing.detectors
 
 import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
+import parsing.AtomsListener
 
-open class Detector(open val visitor: AtomsVisitor, open val graph: ConfusionGraph) {
+open class Detector(open val listener: AtomsListener, open val graph: ConfusionGraph) {
     open fun detect(ctx: JavaParser.ExprInfixContext) {}
     open fun detect(ctx: JavaParser.ExprPrefixContext) {}
     open fun detect(ctx: JavaParser.ExprPostfixContext) {}

@@ -1,39 +1,52 @@
 package parsing.detectors
 
 import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.tree.ParseTreeWalker
 import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
+import parsing.AtomsListener
 import parsing.ParsedFile
+import kotlin.test.assertEquals
 
 open class DetectorTest {
-    val visitor = AtomsVisitor()
+    val listener = AtomsListener()
     val graph = ConfusionGraph(listOf("f1"))
 
     lateinit var detector: Detector
 
     init {
-        visitor.fileName = "f1"
+        listener.fileName = "f1"
     }
 
-    private fun parse(code: String): Triple<AtomsVisitor, ConfusionGraph, ParsedFile> {
+    private fun parse(code: String): Triple<AtomsListener, ConfusionGraph, ParsedFile> {
 
         // register detector
-        visitor.registerDetector(detector)
+        listener.registerDetector(detector)
 
         val file = ParsedFile(CharStreams.fromString(code))
 
-        return Triple(visitor, graph, file)
+        return Triple(listener, graph, file)
     }
 
     protected fun runVisitorExpr(code: String): List<List<Any>> {
-        val (v, g, file) = parse(code)
-        file.parser.expression().accept(v)
-        return g.getAllAtomAppearances()
+        val (atomListener, graph, file) = parse(code)
+//        file.parser.expression().accept(v)
+        val tree = file.parser.expression()
+        val walker = ParseTreeWalker()
+        walker.walk(atomListener, tree)
+        return graph.getAllAtomAppearances()
     }
 
     protected fun runVisitorFile(code: String): List<List<Any>> {
-        val (v, g, file) = parse(code)
-        file.parser.compilationUnit().accept(v)
-        return g.getAllAtomAppearances()
+        val (atomListener, graph, file) = parse(code)
+//        file.parser.compilationUnit().accept(v)
+        val tree = file.parser.compilationUnit()
+        val walker = ParseTreeWalker()
+        walker.walk(atomListener, tree)
+        return graph.getAllAtomAppearances()
+    }
+
+    protected fun assertAtom(atoms: List<List<Any>>, expectedAtom: String) {
+        assertEquals(1, atoms.size)
+        assertEquals(expectedAtom, atoms[0][0])
     }
 }
