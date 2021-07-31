@@ -9,5 +9,6 @@ class MyClass {
             System.out.println(a);
         }
         int b = (a == 3) ? 4 : 5;
+        b = 34;
     }
 }
