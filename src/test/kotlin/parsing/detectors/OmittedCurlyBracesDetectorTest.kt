@@ -6,62 +6,112 @@ import kotlin.test.assertTrue
 
 internal class OmittedCurlyBracesDetectorTest : DetectorTest() {
 
+    private fun assertPresent(atoms: List<List<Any>>) {
+        assertAtom(atoms, "OMITTED_CURLY_BRACES")
+    }
+
+    private fun assertAbsent(atoms: List<List<Any>>) {
+        assertTrue(atoms.isEmpty())
+    }
+
     @BeforeEach
     fun setup() {
         this.detector = OmittedCurlyBracesDetector(this.listener, this.graph)
     }
 
     @Test
-    fun testForBasic() {
+    fun testForPresent() {
         val atoms = runVisitorBlock("{ for(;;) foo(); bar(); }")
-        assertAtom(atoms, "OMITTED_CURLY_BRACES")
+        assertPresent(atoms)
     }
 
     @Test
-    fun testForWithNewline() {
+    fun testForNewline() {
         val atoms = runVisitorBlock("{ for(;;) foo();\nbar(); }")
-        assertTrue(atoms.isEmpty())
-    }
-
-    @Test
-    fun testForWithNewlineAndSpaces() {
-        val atoms = runVisitorBlock("{ for(;;) foo();  \nbar(); }")
-        assertTrue(atoms.isEmpty())
+        assertAbsent(atoms)
     }
 
     @Test
     fun testForLastStatement() {
         val atoms = runVisitorBlock("{ for(;;) foo(); }")
-        assertTrue(atoms.isEmpty())
+        assertAbsent(atoms)
     }
 
     @Test
-    fun testWhileBasic() {
+    fun testForCurlyPresent() {
+        val atoms = runVisitorBlock("{ for(;;) {foo();} bar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testWhilePresent() {
         val atoms = runVisitorBlock("{ while(true) foo(); bar(); }")
-        assertAtom(atoms, "OMITTED_CURLY_BRACES")
-    }
-
-    @Test
-    fun testWhileithNewline() {
-        val atoms = runVisitorBlock("{ while(true) foo();\nbar(); }")
-        assertTrue(atoms.isEmpty())
-    }
-
-    @Test
-    fun testWhileWithNewlineAndSpaces() {
-        val atoms = runVisitorBlock("{ while(true) foo();  \nbar(); }")
-        assertTrue(atoms.isEmpty())
+        assertPresent(atoms)
     }
 
     @Test
     fun testWhileLastStatement() {
         val atoms = runVisitorBlock("{ while(true) foo(); }")
-        assertTrue(atoms.isEmpty())
+        assertAbsent(atoms)
     }
 
     @Test
-    fun testIf() {
+    fun testWhileNewline() {
+        val atoms = runVisitorBlock("{ while (true) foo(); \nbar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testWhileBrackets() {
+        val atoms = runVisitorBlock("{ while (true) { foo(); } \nbar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testIfPresent() {
+        val atoms = runVisitorBlock("{ if (true) foo(); bar(); }")
+        assertPresent(atoms)
+    }
+
+    @Test
+    fun testIfLastStatemet() {
+        val atoms = runVisitorBlock("{ if (true) foo(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testIfNewline() {
+        val atoms = runVisitorBlock("{ if (true) foo();\nbar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testIfBrackets() {
+        val atoms = runVisitorBlock("{ if (true) { foo(); } dar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testElsePresent() {
+        val atoms = runVisitorBlock("{ if (true) foo(); else bar(); dar(); }")
+        assertPresent(atoms)
+    }
+
+    @Test
+    fun testElseLastStatement() {
         val atoms = runVisitorBlock("{ if (true) foo(); else bar(); }")
-        assertTrue(atoms.isEmpty())
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testElseNewline() {
+        val atoms = runVisitorBlock("{ if (true) foo(); else bar();\ndar(); }")
+        assertAbsent(atoms)
+    }
+
+    @Test
+    fun testElseBrackets() {
+        val atoms = runVisitorBlock("{ if (true) foo(); else { bar(); } dar(); }")
+        assertAbsent(atoms)
     }
 }
