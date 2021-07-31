@@ -298,11 +298,33 @@ public interface JavaParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLiteral(JavaParser.LiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#integerLiteral}.
+	 * Visit a parse tree produced by the {@code intLitDecimal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIntegerLiteral(JavaParser.IntegerLiteralContext ctx);
+	T visitIntLitDecimal(JavaParser.IntLitDecimalContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code intLitHex}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntLitHex(JavaParser.IntLitHexContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code intLitOctal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntLitOctal(JavaParser.IntLitOctalContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code intLitBin}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntLitBin(JavaParser.IntLitBinContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#floatLiteral}.
 	 * @param ctx the parse tree

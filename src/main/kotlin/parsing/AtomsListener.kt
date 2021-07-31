@@ -46,4 +46,8 @@ class AtomsListener : JavaParserBaseListener() {
     override fun enterExprTernary(ctx: JavaParser.ExprTernaryContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
+
+    override fun enterIntLitOctal(ctx: JavaParser.IntLitOctalContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
 }
