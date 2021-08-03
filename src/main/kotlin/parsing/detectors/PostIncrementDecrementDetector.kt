@@ -9,9 +9,11 @@ class PostIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGr
 
     override fun detect(ctx: JavaParser.ExprPostfixContext) {
         val parent = ctx.parent
-        if (parent !is JavaParser.StatExpressionContext &&
-            parent !is JavaParser.ExpressionListContext &&
-            parent != null
+        if ((
+            parent !is JavaParser.StatExpressionContext &&
+                parent !is JavaParser.ExpressionListContext &&
+                parent != null
+            ) || parent?.parent is JavaParser.MethodCallContext
         ) {
             graph.addAppearancesOfAtom(Atom.POST_INCREMENT_DECREMENT, listener.fileName, mutableSetOf(ctx.start.line))
         }

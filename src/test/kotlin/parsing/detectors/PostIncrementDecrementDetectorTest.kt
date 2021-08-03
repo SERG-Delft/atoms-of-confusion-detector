@@ -61,6 +61,13 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
     }
 
     @Test
+    fun testIncrementInMethodCall() {
+        val code = "methodCall(a++)"
+        val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
+    }
+
+    @Test
     fun testStatementDoesNotTrigger() {
         val code = "v1--"
         val atoms = runVisitorExpr(code)

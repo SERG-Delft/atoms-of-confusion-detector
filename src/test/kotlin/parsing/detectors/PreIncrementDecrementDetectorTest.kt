@@ -68,6 +68,13 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
     }
 
     @Test
+    fun testPostIncrementInMethodCall() {
+        val code = "method(++a)"
+        val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
+    }
+
+    @Test
     fun testIncrementInForLoopDoesNotTrigger() {
         val code = "for (int i = 0; i < 10; ++i) {}"
         val atoms = runVisitorExpr(code)

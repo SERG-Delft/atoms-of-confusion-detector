@@ -9,9 +9,11 @@ class PreIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGra
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
         val parent = ctx.parent
-        if (parent !is JavaParser.StatExpressionContext &&
-            parent !is JavaParser.ExpressionListContext &&
-            parent != null
+        if ((
+            parent !is JavaParser.StatExpressionContext &&
+                parent !is JavaParser.ExpressionListContext &&
+                parent != null
+            ) || parent?.parent is JavaParser.MethodCallContext
         ) {
             graph.addAppearancesOfAtom(Atom.PRE_INCREMENT_DECREMENT, listener.fileName, mutableSetOf(ctx.start.line))
         }
