@@ -61,6 +61,10 @@ class AtomsListener : JavaParserBaseListener() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
+    override fun enterExprTypeCast(ctx: JavaParser.ExprTypeCastContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
     override fun enterClassDeclaration(ctx: JavaParser.ClassDeclarationContext) {
         val classSymbol = ClassSymbol(ctx.IDENTIFIER().toString())
         setupNewSymbol(classSymbol)

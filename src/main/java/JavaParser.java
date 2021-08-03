@@ -7643,12 +7643,13 @@ public class JavaParser extends Parser {
 		}
 	}
 	public static class ExprTypeCastContext extends ExpressionContext {
+		public TypeTypeContext cast;
 		public ExpressionContext subexpr;
 		public TerminalNode LPAREN() { return getToken(JavaParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(JavaParser.RPAREN, 0); }
 		public TypeTypeContext typeType() {
 			return getRuleContext(TypeTypeContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(JavaParser.RPAREN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
@@ -8267,7 +8268,7 @@ public class JavaParser extends Parser {
 					_alt = getInterpreter().adaptivePredict(_input,135,_ctx);
 				}
 				setState(1124);
-				typeType();
+				((ExprTypeCastContext)_localctx).cast = typeType();
 				setState(1125);
 				match(RPAREN);
 				setState(1126);
