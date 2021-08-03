@@ -29,7 +29,6 @@ open class DetectorTest {
 
     protected fun runVisitorExpr(code: String): List<List<Any>> {
         val (atomListener, graph, file) = parse(code)
-//        file.parser.expression().accept(v)
         val tree = file.parser.expression()
         val walker = ParseTreeWalker()
         walker.walk(atomListener, tree)
@@ -38,7 +37,6 @@ open class DetectorTest {
 
     protected fun runVisitorFile(code: String): List<List<Any>> {
         val (atomListener, graph, file) = parse(code)
-//        file.parser.compilationUnit().accept(v)
         val tree = file.parser.compilationUnit()
         val walker = ParseTreeWalker()
         walker.walk(atomListener, tree)

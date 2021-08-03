@@ -4,6 +4,7 @@ import JavaParserBaseListener
 import org.antlr.symtab.ClassSymbol
 import org.antlr.symtab.LocalScope
 import org.antlr.symtab.Scope
+import org.antlr.symtab.Symbol
 import org.antlr.symtab.SymbolWithScope
 import org.antlr.symtab.Type
 import parsing.detectors.Detector
@@ -70,7 +71,6 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
-        // ctx.IDENTIFIER() is not constant time we should find a better way to get it
         val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
         val function = AtomsMethodSymbol(ctx.IDENTIFIER().toString(), type)
         setupNewSymbol(function)
@@ -106,19 +106,15 @@ class AtomsListener : JavaParserBaseListener() {
     override fun enterFieldDeclaration(ctx: JavaParser.FieldDeclarationContext) {
         val type = TypeResolver.resolveType(ctx.typeType().text)
         val declarators = ctx.variableDeclarators()
-        updateScopeDueToClassFieldDeclaration(declarators, type)
+        val constructor = { i: String, t: Type, v: String? -> AtomsClassFieldSymbol(i, t, v) }
+        updateScope(declarators, type, constructor)
     }
 
     override fun enterLocalVariableDeclaration(ctx: JavaParser.LocalVariableDeclarationContext) {
         val type = TypeResolver.resolveType(ctx.typeType().text)
         val declarators = ctx.variableDeclarators()
-        updateScopeDueToLocalVariableDeclaration(declarators, type)
-    }
-
-    override fun exitLocalVariableDeclaration(ctx: JavaParser.LocalVariableDeclarationContext?) {
-        currentScope?.allSymbols?.forEach {
-            println(it)
-        }
+        val constructor = { i: String, t: Type, v: String? -> AtomsLocalVariableSymbol(i, t, v) }
+        updateScope(declarators, type, constructor)
     }
 
     override fun enterExprAssignment(ctx: JavaParser.ExprAssignmentContext) {
@@ -130,13 +126,18 @@ class AtomsListener : JavaParserBaseListener() {
         }
     }
 
-    override fun exitExprAssignment(ctx: JavaParser.ExprAssignmentContext) {
-        currentScope?.allSymbols?.forEach {
-            println(it)
-        }
-    }
-
-    fun updateScopeDueToClassFieldDeclaration(declarators: JavaParser.VariableDeclaratorsContext, type: Type) {
+    /**
+     * Updates the current scope based on (a series of) declaration(s).
+     *
+     * @param declarators the declarations.
+     * @param type the type of the variables being declared.
+     * @param constructor the constructor (lambda) to be used to create the new symbols.
+     */
+    fun updateScope(
+        declarators: JavaParser.VariableDeclaratorsContext,
+        type: Type,
+        constructor: (String, Type, String?) -> Symbol
+    ) {
         val lastChildIndex = declarators.childCount - 1
         var assignmentValue: String? = null
         // walk backwards for efficiency since we know that the last declaration will contain a value
@@ -148,24 +149,7 @@ class AtomsListener : JavaParserBaseListener() {
                 if (value != null) {
                     assignmentValue = value.text
                 }
-                currentScope?.define(AtomsClassFieldSymbol(identifier, type, assignmentValue))
-            }
-        }
-    }
-
-    fun updateScopeDueToLocalVariableDeclaration(declarators: JavaParser.VariableDeclaratorsContext, type: Type) {
-        val lastChildIndex = declarators.childCount - 1
-        var assignmentValue: String? = null
-        // walk backwards for efficiency since we know that the last declaration will contain a value
-        for (i in lastChildIndex downTo 0) {
-            val child = declarators.children[i]
-            if (child is JavaParser.VariableDeclaratorContext) {
-                val identifier = child.variableDeclaratorId().text
-                val value = child.variableInitializer()
-                if (value != null) {
-                    assignmentValue = value.text
-                }
-                currentScope?.define(AtomsLocalVariableSymbol(identifier, type, assignmentValue))
+                currentScope?.define(constructor(identifier, type, assignmentValue))
             }
         }
     }
