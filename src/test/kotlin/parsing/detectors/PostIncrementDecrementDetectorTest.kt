@@ -67,6 +67,20 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
     }
 
     @Test
+    fun testIncrementInIf() {
+        val code = "if (a++) {}"
+        val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
+    }
+
+    @Test
+    fun testIncrementInIfElseIf() {
+        val code = "if (a++) {} else if (b++) {} else {}"
+        val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT")
+    }
+
+    @Test
     fun testStatementDoesNotTrigger() {
         val code = "v1--"
         val atoms = runVisitorExpr(code)

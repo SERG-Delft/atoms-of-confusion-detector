@@ -37,7 +37,7 @@ open class DetectorTest {
 
     protected fun runVisitorFile(code: String): List<List<Any>> {
         val (atomListener, graph, file) = parse(code)
-            val tree = file.parser.compilationUnit()
+        val tree = file.parser.compilationUnit()
         val walker = ParseTreeWalker()
         walker.walk(atomListener, tree)
         return graph.getAllAtomAppearances()

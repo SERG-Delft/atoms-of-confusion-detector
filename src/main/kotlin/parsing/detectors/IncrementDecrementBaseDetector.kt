@@ -18,7 +18,7 @@ open class IncrementDecrementBaseDetector(
         val line = mutableSetOf(lineNum)
         if (parent is JavaParser.StatExpressionContext || parent == null) {
             graph.addAppearancesOfAtom(atomAsStatement, listener.fileName, line)
-        } else if (parent?.parent is JavaParser.ForControlContext) {
+        } else if (parent.parent is JavaParser.ForControlContext) {
             graph.addAppearancesOfAtom(atomInForLoop, listener.fileName, line)
         } else {
             graph.addAppearancesOfAtom(atomInContext, listener.fileName, line)
