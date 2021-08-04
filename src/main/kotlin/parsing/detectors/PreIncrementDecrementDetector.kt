@@ -5,17 +5,15 @@ import output.graph.ConfusionGraph
 import parsing.AtomsListener
 
 @Visit(JavaParser.ExprPrefixContext::class)
-class PreIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
+class PreIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGraph) : IncrementDecrementBaseDetector(
+    listener,
+    graph,
+    Atom.PRE_INCREMENT_DECREMENT,
+    Atom.PRE_INCREMENT_DECREMENT_IN_FOR_LOOP,
+    Atom.PRE_INCREMENT_DECREMENT_AS_STATEMENT
+) {
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
-        val parent = ctx.parent
-        if ((
-            parent !is JavaParser.StatExpressionContext &&
-                parent !is JavaParser.ExpressionListContext &&
-                parent != null
-            ) || parent?.parent is JavaParser.MethodCallContext
-        ) {
-            graph.addAppearancesOfAtom(Atom.PRE_INCREMENT_DECREMENT, listener.fileName, mutableSetOf(ctx.start.line))
-        }
+        super.analyzePostPreIncrementDecrement(ctx.parent, ctx.start.line)
     }
 }

@@ -2,7 +2,6 @@ package parsing.detectors
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 internal class PostIncrementDecrementDetectorTest : DetectorTest() {
 
@@ -71,13 +70,13 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
     fun testStatementDoesNotTrigger() {
         val code = "v1--"
         val atoms = runVisitorExpr(code)
-        assertEquals(0, atoms.size)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT_AS_STATEMENT")
     }
 
     @Test
-    fun testIncrementInForLoopDoesNotTrigger() {
-        val code = "for (int i = 0; i < 10; i++) {}"
-        val atoms = runVisitorExpr(code)
-        assertEquals(0, atoms.size)
+    fun testIncrementInForLoop() {
+        val code = "class A { public void foo() { for (int i = 0; i < 10; i++) {} } }"
+        val atoms = runVisitorFile(code)
+        assertAtom(atoms, "POST_INCREMENT_DECREMENT_IN_FOR_LOOP")
     }
 }
