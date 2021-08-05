@@ -3,7 +3,8 @@ package parsing.symtab.symbols
 import org.antlr.symtab.MethodSymbol
 import org.antlr.symtab.Type
 
-class AtomsMethodSymbol(val myName: String, val returnType: Type) : MethodSymbol(myName) {
+class AtomsMethodSymbol(val myName: String, val returnType: Type, val parameters: MutableSet<AtomsParameterSymbol>) :
+    MethodSymbol(myName) {
 
     init {
         super.setType(returnType)

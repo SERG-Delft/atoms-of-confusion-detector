@@ -13,6 +13,7 @@ import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
 import parsing.symtab.symbols.AtomsMethodSymbol
+import parsing.symtab.symbols.AtomsParameterSymbol
 import parsing.symtab.types.TypeResolver
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -76,8 +77,17 @@ class AtomsListener : JavaParserBaseListener() {
 
     override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
         val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
-        val function = AtomsMethodSymbol(ctx.IDENTIFIER().toString(), type)
+        val function = AtomsMethodSymbol(ctx.IDENTIFIER().toString(), type, mutableSetOf())
         setupNewSymbol(function)
+    }
+
+    override fun enterFormalParameter(ctx: JavaParser.FormalParameterContext) {
+        val parameter = AtomsParameterSymbol(
+            ctx.variableDeclaratorId().text,
+            TypeResolver.resolveType(ctx.typeType().text)
+        )
+        (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+        currentScope?.define(parameter)
     }
 
     override fun exitMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
