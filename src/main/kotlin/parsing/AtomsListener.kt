@@ -1,14 +1,28 @@
 package parsing
 
+import JavaParser
 import JavaParserBaseListener
+import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
+@Suppress("TooManyFunctions")
 class AtomsListener : JavaParserBaseListener() {
 
     lateinit var fileName: String
+    lateinit var tokens: TokenStream
+
+    /**
+     * Set up the listener to traverse a file
+     *
+     * @pa
+     */
+    fun setFile(file: ParsedFile) {
+        fileName = file.stream.sourceName
+        this.tokens = file.tokens
+    }
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
 
@@ -44,6 +58,30 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterExprTernary(ctx: JavaParser.ExprTernaryContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatIfElse(ctx: JavaParser.StatIfElseContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatFor(ctx: JavaParser.StatForContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatWhile(ctx: JavaParser.StatWhileContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatDoWhile(ctx: JavaParser.StatDoWhileContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatBlock(ctx: JavaParser.StatBlockContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatExpression(ctx: JavaParser.StatExpressionContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
