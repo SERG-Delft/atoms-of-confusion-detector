@@ -78,4 +78,8 @@ class AtomsListener : JavaParserBaseListener() {
     override fun enterStatExpression(ctx: JavaParser.StatExpressionContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
+
+    override fun enterExprTypeCast(ctx: JavaParser.ExprTypeCastContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
 }
