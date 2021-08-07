@@ -19,7 +19,7 @@ open class DetectorTest {
         // register detector
         listener.registerDetector(detector)
         val file = ParsedFile(CharStreams.fromString(code))
-        listener.traverseFile(file)
+        listener.setFile(file)
 
         return Triple(listener, graph, file)
     }

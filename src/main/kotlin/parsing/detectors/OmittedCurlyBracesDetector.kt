@@ -28,7 +28,7 @@ class OmittedCurlyBracesDetector(listener: AtomsListener, graph: ConfusionGraph)
 
         // for each whitespace token separating the statements check if there is a newline
         for (i in wsStart..wsStop) {
-            if (listener.file.tokens[i].text.contains("\n")) return true
+            if (listener.tokens[i].text.contains("\n")) return true
         }
 
         return false

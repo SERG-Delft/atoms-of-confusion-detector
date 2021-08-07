@@ -2,6 +2,7 @@ package parsing
 
 import JavaParser
 import JavaParserBaseListener
+import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
 import kotlin.reflect.KClass
@@ -11,11 +12,16 @@ import kotlin.reflect.full.findAnnotation
 class AtomsListener : JavaParserBaseListener() {
 
     lateinit var fileName: String
-    lateinit var file: ParsedFile
+    lateinit var tokens: TokenStream
 
-    fun traverseFile(file: ParsedFile) {
+    /**
+     * Set up the listener to traverse a file
+     *
+     * @pa
+     */
+    fun setFile(file: ParsedFile) {
         fileName = file.stream.sourceName
-        this.file = file
+        this.tokens = file.tokens
     }
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
