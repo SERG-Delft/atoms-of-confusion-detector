@@ -1,5 +1,6 @@
 package parsing
 
+import JavaParser
 import JavaParserBaseListener
 import org.antlr.symtab.ClassSymbol
 import org.antlr.symtab.LocalScope
@@ -7,6 +8,7 @@ import org.antlr.symtab.Scope
 import org.antlr.symtab.Symbol
 import org.antlr.symtab.SymbolWithScope
 import org.antlr.symtab.Type
+import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
 import parsing.symtab.symbols.AtomsBaseSymbol
@@ -24,6 +26,17 @@ class AtomsListener : JavaParserBaseListener() {
     var currentScope: Scope? = null
 
     lateinit var fileName: String
+    lateinit var tokens: TokenStream
+
+    /**
+     * Set up the listener to traverse a file
+     *
+     * @pa
+     */
+    fun setFile(file: ParsedFile) {
+        fileName = file.stream.sourceName
+        this.tokens = file.tokens
+    }
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
 
@@ -59,6 +72,30 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterExprTernary(ctx: JavaParser.ExprTernaryContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatIfElse(ctx: JavaParser.StatIfElseContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatFor(ctx: JavaParser.StatForContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatWhile(ctx: JavaParser.StatWhileContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatDoWhile(ctx: JavaParser.StatDoWhileContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatBlock(ctx: JavaParser.StatBlockContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterStatExpression(ctx: JavaParser.StatExpressionContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
