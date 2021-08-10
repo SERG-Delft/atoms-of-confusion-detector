@@ -83,6 +83,10 @@ class AtomsListener : JavaParserBaseListener() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
+    override fun enterForControl(ctx: JavaParser.ForControlContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
     override fun enterStatWhile(ctx: JavaParser.StatWhileContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
@@ -131,17 +135,6 @@ class AtomsListener : JavaParserBaseListener() {
         popScope()
     }
 
-//    override fun enterBlockStatement(ctx: JavaParser.BlockStatementContext) {
-//        if (ctx.parent !is JavaParser.MethodBodyContext) {
-//            val localScope = LocalScope(currentScope)
-//            pushScope(localScope)
-//        }
-//    }
-
-//    override fun exitBlockStatement(ctx: JavaParser.BlockStatementContext) {
-//        popScope()
-//    }
-
     override fun enterBlock(ctx: JavaParser.BlockContext?) {
         val localScope = LocalScope(currentScope)
         pushScope(localScope)
@@ -180,12 +173,15 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterExprAssignment(ctx: JavaParser.ExprAssignmentContext) {
+        // scoping logic
         val assignee = ctx.assignee.text
         val assignedValue = ctx.assigned.text
         val symbol = currentScope?.resolve(assignee)
         if (symbol != null && symbol is AtomsBaseSymbol) {
             symbol.value = assignedValue
         }
+        // detecting logic
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
     /**

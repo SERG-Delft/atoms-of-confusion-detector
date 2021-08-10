@@ -17,7 +17,6 @@ import parsing.detectors.LogicAsControlFlowDetector
 import parsing.detectors.OmittedCurlyBracesDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
-import parsing.detectors.RepurposedVariablesDetector
 import java.nio.file.Path
 
 /**

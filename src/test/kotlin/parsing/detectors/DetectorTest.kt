@@ -60,9 +60,4 @@ open class DetectorTest {
         assertEquals(1, atoms.size)
         assertEquals(expectedAtom, atoms[0][0])
     }
-
-    protected fun assertAtom(atoms: List<List<Any>>, expectedAtomName: String) {
-        kotlin.test.assertEquals(1, atoms.size)
-        kotlin.test.assertEquals(expectedAtomName, atoms[0][0])
-    }
 }
