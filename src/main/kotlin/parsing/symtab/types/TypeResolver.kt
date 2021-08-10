@@ -18,6 +18,8 @@ object TypeResolver {
             ArrayType(PrimitiveType(type.substring(0, type.length - 2)))
         } else if (type.endsWith("[]") && !primitives.contains(type.substring(0, type.length - 2))) {
             ArrayType(ReferenceType(type))
+        } else if (type == "void") {
+            VoidType()
         } else {
             ReferenceType(type)
         }

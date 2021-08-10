@@ -94,12 +94,23 @@ class AtomsListener : JavaParserBaseListener() {
         popScope()
     }
 
-    override fun enterBlockStatement(ctx: JavaParser.BlockStatementContext) {
+//    override fun enterBlockStatement(ctx: JavaParser.BlockStatementContext) {
+//        if (ctx.parent !is JavaParser.MethodBodyContext) {
+//            val localScope = LocalScope(currentScope)
+//            pushScope(localScope)
+//        }
+//    }
+
+//    override fun exitBlockStatement(ctx: JavaParser.BlockStatementContext) {
+//        popScope()
+//    }
+
+    override fun enterBlock(ctx: JavaParser.BlockContext?) {
         val localScope = LocalScope(currentScope)
         pushScope(localScope)
     }
 
-    override fun exitBlockStatement(ctx: JavaParser.BlockStatementContext) {
+    override fun exitBlock(ctx: JavaParser.BlockContext?) {
         popScope()
     }
 
@@ -147,7 +158,7 @@ class AtomsListener : JavaParserBaseListener() {
      * @param type the type of the variables being declared.
      * @param constructor the constructor (lambda) to be used to create the new symbols.
      */
-    fun updateScope(
+    private fun updateScope(
         declarators: JavaParser.VariableDeclaratorsContext,
         type: Type,
         constructor: (String, Type, String?) -> Symbol
