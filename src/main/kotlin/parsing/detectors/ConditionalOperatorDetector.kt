@@ -2,12 +2,13 @@ package parsing.detectors
 
 import output.Atom
 import output.graph.ConfusionGraph
-import parsing.AtomsVisitor
+import parsing.AtomsListener
 
 @Visit(JavaParser.ExprTernaryContext::class)
-class ConditionalOperatorDetector(visitor: AtomsVisitor, graph: ConfusionGraph) : BaseDetector(visitor, graph) {
+class ConditionalOperatorDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
 
     override fun detect(ctx: JavaParser.ExprTernaryContext) {
-        graph.addAppearancesOfAtom(Atom.CONDITIONAL_OPERATOR, visitor.fileName, mutableSetOf(ctx.start.line))
+        graph.addAppearancesOfAtom(Atom.CONDITIONAL_OPERATOR, listener.fileName, mutableSetOf(ctx.start.line))
+        super.detect(ctx)
     }
 }
