@@ -8,7 +8,7 @@ internal class PostIncrementDecrementDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = PostIncrementDecrementDetector(this.visitor, this.graph)
+        this.detector = PostIncrementDecrementDetector(this.listener, this.graph)
     }
 
     @Test

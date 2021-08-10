@@ -8,7 +8,7 @@ internal class InfixPrecedenceDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = InfixPrecedenceDetector(this.visitor, this.graph)
+        this.detector = InfixPrecedenceDetector(this.listener, this.graph)
     }
 
     @Test

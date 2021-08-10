@@ -387,7 +387,7 @@ localTypeDeclaration
 statement
     : blockLabel=block                                                      #statBlock
     | ASSERT expression (':' expression)? ';'                               #statAssert
-    | IF condition=parExpression body=statement (ELSE statement)?           #statIfElse
+    | IF condition=parExpression ifBody=statement (ELSE elseBody=statement)?    #statIfElse
     | FOR '(' forCtrl=forControl ')' body=statement                         #statFor
     | WHILE condition=parExpression body=statement                          #statWhile
     | DO body=statement WHILE condition=parExpression ';'                   #statDoWhile
@@ -497,7 +497,7 @@ expression
     | expression '[' accessAddr=expression ']'                      #exprArrayAccess
     | methodCall                                                    #exprMethodCall
     | NEW creator                                                   #exprNewExpression
-    | '(' annotation* typeType ')' subexpr=expression               #exprTypeCast
+    | '(' annotation* cast=typeType ')' subexpr=expression          #exprTypeCast
     | subexpr=expression postfix=('++' | '--')                      #exprPostfix
     | prefix=('+'|'-'|'++'|'--') subexpr=expression                 #exprPrefix
     | prefix=('~'|'!') subexpr=expression                           #exprPrefix

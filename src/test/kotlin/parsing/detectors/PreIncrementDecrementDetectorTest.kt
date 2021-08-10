@@ -2,12 +2,13 @@ package parsing.detectors
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 internal class PreIncrementDecrementDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = PreIncrementDecrementDetector(this.visitor, this.graph)
+        this.detector = PreIncrementDecrementDetector(this.listener, this.graph)
     }
 
     @Test
@@ -63,13 +64,13 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
     fun testStatementDoesNotTrigger() {
         val code = "--v1"
         val atoms = runVisitorExpr(code)
-        kotlin.test.assertEquals(0, atoms.size)
+        assertEquals(0, atoms.size)
     }
 
     @Test
     fun testIncrementInForLoopDoesNotTrigger() {
         val code = "for (int i = 0; i < 10; ++i) {}"
         val atoms = runVisitorExpr(code)
-        kotlin.test.assertEquals(0, atoms.size)
+        assertEquals(0, atoms.size)
     }
 }

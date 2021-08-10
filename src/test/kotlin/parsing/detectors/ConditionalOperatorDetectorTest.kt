@@ -8,7 +8,7 @@ internal class ConditionalOperatorDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = ConditionalOperatorDetector(this.visitor, this.graph)
+        this.detector = ConditionalOperatorDetector(this.listener, this.graph)
     }
 
     @Test
@@ -26,6 +26,6 @@ internal class ConditionalOperatorDetectorTest : DetectorTest() {
     @Test
     fun testAtomNotPresent() {
         val atoms = runVisitorFile("class A { void f() {if (a == 2 || a++) bar(); } }")
-        kotlin.test.assertEquals(0, atoms.size)
+        assertEquals(0, atoms.size)
     }
 }

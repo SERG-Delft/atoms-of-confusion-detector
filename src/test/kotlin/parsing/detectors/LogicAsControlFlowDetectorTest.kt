@@ -7,7 +7,7 @@ internal class LogicAsControlFlowDetectorTest : DetectorTest() {
 
     @BeforeEach
     fun setup() {
-        this.detector = LogicAsControlFlowDetector(this.visitor, this.graph)
+        this.detector = LogicAsControlFlowDetector(this.listener, this.graph)
     }
 
     @Test
