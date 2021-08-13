@@ -2,7 +2,11 @@ package parsing.symtab.symbols
 
 import org.antlr.symtab.Type
 
-class AtomsLocalVariableSymbol(override val myName: String, override val myType: Type, override var value: String?) :
+class AtomsLocalVariableSymbol(
+    override val myName: String,
+    override val myType: Type,
+    override var value: String?
+) :
     AtomsBaseSymbol(myName, myType, value) {
 
     init {

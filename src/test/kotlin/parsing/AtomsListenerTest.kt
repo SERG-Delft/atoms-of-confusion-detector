@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import output.graph.ConfusionGraph
 import parsing.detectors.Detector
 import parsing.detectors.Visit
+import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
 import parsing.symtab.symbols.AtomsParameterSymbol
@@ -155,6 +156,10 @@ internal class AtomsListenerTest {
     }
 }
 
+/**
+ * This class is used to assert the scope during
+ * the traversal of the program.
+ */
 @Visit(JavaParser.ExprPostfixContext::class)
 class TestDetector(
     override val listener: AtomsListener,
@@ -165,5 +170,8 @@ class TestDetector(
     override fun detect(ctx: JavaParser.ExprPostfixContext) {
         val v = listener.currentScope?.resolve(nameOfField)
         assertEquals(expected, v)
+        if (expected is AtomsBaseSymbol) {
+            assertEquals(expected.value, (v as AtomsBaseSymbol).parseTreeNodeValue?.text)
+        }
     }
 }

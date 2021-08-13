@@ -8,6 +8,7 @@ import org.antlr.symtab.Scope
 import org.antlr.symtab.Symbol
 import org.antlr.symtab.SymbolWithScope
 import org.antlr.symtab.Type
+import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
@@ -27,6 +28,7 @@ class AtomsListener : JavaParserBaseListener() {
 
     lateinit var fileName: String
     lateinit var tokens: TokenStream
+    lateinit var parsedFile: ParsedFile
 
     /**
      * Set up the listener to traverse a file
@@ -36,6 +38,7 @@ class AtomsListener : JavaParserBaseListener() {
     fun setFile(file: ParsedFile) {
         fileName = file.stream.sourceName
         this.tokens = file.tokens
+        this.parsedFile = file
     }
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
@@ -131,17 +134,6 @@ class AtomsListener : JavaParserBaseListener() {
         popScope()
     }
 
-//    override fun enterBlockStatement(ctx: JavaParser.BlockStatementContext) {
-//        if (ctx.parent !is JavaParser.MethodBodyContext) {
-//            val localScope = LocalScope(currentScope)
-//            pushScope(localScope)
-//        }
-//    }
-
-//    override fun exitBlockStatement(ctx: JavaParser.BlockStatementContext) {
-//        popScope()
-//    }
-
     override fun enterBlock(ctx: JavaParser.BlockContext?) {
         val localScope = LocalScope(currentScope)
         pushScope(localScope)
@@ -173,19 +165,27 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterLocalVariableDeclaration(ctx: JavaParser.LocalVariableDeclarationContext) {
+        // scoping logic
         val type = TypeResolver.resolveType(ctx.typeType().text)
         val declarators = ctx.variableDeclarators()
         val constructor = { i: String, t: Type, v: String? -> AtomsLocalVariableSymbol(i, t, v) }
         updateScope(declarators, type, constructor)
+        // detecting logic
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun enterVariableDeclarator(ctx: JavaParser.VariableDeclaratorContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
     override fun enterExprAssignment(ctx: JavaParser.ExprAssignmentContext) {
         val assignee = ctx.assignee.text
-        val assignedValue = ctx.assigned.text
         val symbol = currentScope?.resolve(assignee)
         if (symbol != null && symbol is AtomsBaseSymbol) {
-            symbol.value = assignedValue
+            symbol.value = ctx.assigned.text
+            symbol.parseTreeNodeValue = ctx.assigned
         }
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
     /**
@@ -201,7 +201,8 @@ class AtomsListener : JavaParserBaseListener() {
         constructor: (String, Type, String?) -> Symbol
     ) {
         val lastChildIndex = declarators.childCount - 1
-        var assignmentValue: String? = null
+        var assignmentValueTextual: String? = null
+        var assignmentValueParseTree: ParserRuleContext? = null
         // walk backwards for efficiency since we know that the last declaration will contain a value
         for (i in lastChildIndex downTo 0) {
             val child = declarators.children[i]
@@ -209,9 +210,14 @@ class AtomsListener : JavaParserBaseListener() {
                 val identifier = child.variableDeclaratorId().text
                 val value = child.variableInitializer()
                 if (value != null) {
-                    assignmentValue = value.text
+                    assignmentValueTextual = value.text
+                    assignmentValueParseTree = value
                 }
-                currentScope?.define(constructor(identifier, type, assignmentValue))
+                val symbol = constructor(identifier, type, assignmentValueTextual)
+                if (symbol is AtomsBaseSymbol) {
+                    symbol.parseTreeNodeValue = assignmentValueParseTree
+                }
+                currentScope?.define(symbol)
             }
         }
     }

@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.5.10"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("io.gitlab.arturbosch.detekt") version "1.17.1"
+    jacoco
 }
 
 group = "org.serg"
@@ -26,6 +27,14 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 tasks.withType<KotlinCompile>() {

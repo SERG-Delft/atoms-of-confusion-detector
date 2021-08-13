@@ -19,10 +19,6 @@ class LogicAsControlFlowDetector(listener: AtomsListener, graph: ConfusionGraph)
         insideShortCircuitRight = ctx.op.text == "||" || ctx.op.text == "&&"
         walker.walk(listener, ctx.r)
         insideShortCircuitRight = false
-//        listener.visit(ctx.l)
-//        insideShortCircuitRight = ctx.op.text == "||" || ctx.op.text == "&&"
-//        listener.visit(ctx.r)
-//        insideShortCircuitRight = false
     }
 
     override fun detect(ctx: JavaParser.ExprPostfixContext) {
