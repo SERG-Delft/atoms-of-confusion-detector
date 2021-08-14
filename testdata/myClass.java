@@ -1,18 +1,15 @@
 class MyClass {
 
-    public int foo(int a) {
-        int ret = (a == 4) ? 42 : 43;
-        return ret;
-    }
+    int a = 42;
+    int b = 43 + --a;
+    int c = 23 + a++;
 
-    public void bar(int a) {
+    public void bar(int a, int c) {
         if (a == 2 || a++) {
             System.out.println(a);
         }
+        a = 3;
+        int b = (a == 3) ? 4 : 5;
+        b = 34;
     }
-
-    public void arithmetic(int a) {
-        int b = a + 3 / 4;
-    }
-
 }
