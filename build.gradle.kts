@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.5.10"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("io.gitlab.arturbosch.detekt") version "1.17.1"
+    jacoco
 }
 
 group = "org.serg"
@@ -21,10 +22,19 @@ dependencies {
     implementation("org.antlr:antlr4-runtime:4.9.2")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
+    implementation("org.antlr:symtab:1.0.8")
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 tasks.withType<KotlinCompile>() {
