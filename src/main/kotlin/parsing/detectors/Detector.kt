@@ -18,4 +18,7 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.StatBlockContext) {}
     open fun detect(ctx: JavaParser.StatExpressionContext) {}
     open fun detect(ctx: JavaParser.ExprTypeCastContext) {}
+    open fun detect(ctx: JavaParser.ExprAssignmentContext) {}
+    open fun detect(ctx: JavaParser.LocalVariableDeclarationContext) {}
+    open fun detect(ctx: JavaParser.VariableDeclaratorContext) {}
 }
