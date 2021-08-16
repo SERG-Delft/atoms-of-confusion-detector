@@ -15,6 +15,7 @@ import parsing.detectors.ChangeOfLiteralEncodingDetector
 import parsing.detectors.ConditionalOperatorDetector
 import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
+import parsing.detectors.OmittedCurlyBracesDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
 import java.nio.file.Path
@@ -49,14 +50,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         }
 
         val confusionGraph = ConfusionGraph(sources.map { it.toString() })
-//        val visitor = AtomsVisitor()
         val listener = AtomsListener()
-//
-//        visitor.registerDetector(LogicAsControlFlowDetector(visitor, confusionGraph))
-//        visitor.registerDetector(InfixPrecedenceDetector(visitor, confusionGraph))
-//        visitor.registerDetector(ConditionalOperatorDetector(visitor, confusionGraph))
-//        visitor.registerDetector(PostIncrementDecrementDetector(visitor, confusionGraph))
-//        visitor.registerDetector(PreIncrementDecrementDetector(visitor, confusionGraph))
 
         listener.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph))
         listener.registerDetector(InfixPrecedenceDetector(listener, confusionGraph))
@@ -64,14 +58,13 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         listener.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph))
         listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
         listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
+        listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
         parsers.forEach {
-            listener.fileName = it.stream.sourceName
-            val tree = it.parser.compilationUnit()
-            val walker = ParseTreeWalker()
-            walker.walk(listener, tree)
+            listener.setFile(it)
+            ParseTreeWalker().walk(listener, it.parser.compilationUnit())
         }
 
         CsvWriter.outputData(confusionGraph)

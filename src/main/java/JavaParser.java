@@ -6147,7 +6147,8 @@ public class JavaParser extends Parser {
 	}
 	public static class StatIfElseContext extends StatementContext {
 		public ParExpressionContext condition;
-		public StatementContext body;
+		public StatementContext ifBody;
+		public StatementContext elseBody;
 		public TerminalNode IF() { return getToken(JavaParser.IF, 0); }
 		public ParExpressionContext parExpression() {
 			return getRuleContext(ParExpressionContext.class,0);
@@ -6225,7 +6226,7 @@ public class JavaParser extends Parser {
 				setState(872);
 				((StatIfElseContext)_localctx).condition = parExpression();
 				setState(873);
-				((StatIfElseContext)_localctx).body = statement();
+				((StatIfElseContext)_localctx).ifBody = statement();
 				setState(876);
 				_errHandler.sync(this);
 				switch ( getInterpreter().adaptivePredict(_input,103,_ctx) ) {
@@ -6234,7 +6235,7 @@ public class JavaParser extends Parser {
 					setState(874);
 					match(ELSE);
 					setState(875);
-					statement();
+					((StatIfElseContext)_localctx).elseBody = statement();
 					}
 					break;
 				}

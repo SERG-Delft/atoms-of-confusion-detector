@@ -4,6 +4,7 @@ import JavaParser
 import output.graph.ConfusionGraph
 import parsing.AtomsListener
 
+@Suppress("TooManyFunctions")
 open class Detector(open val listener: AtomsListener, open val graph: ConfusionGraph) {
     open fun detect(ctx: JavaParser.ExprInfixContext) {}
     open fun detect(ctx: JavaParser.ExprPrefixContext) {}
@@ -12,5 +13,14 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.ExprInfixBitshiftContext) {}
     open fun detect(ctx: JavaParser.ExprTernaryContext) {}
     open fun detect(ctx: JavaParser.IntLitOctalContext) {}
+    open fun detect(ctx: JavaParser.StatIfElseContext) {}
+    open fun detect(ctx: JavaParser.StatForContext) {}
+    open fun detect(ctx: JavaParser.StatWhileContext) {}
+    open fun detect(ctx: JavaParser.StatDoWhileContext) {}
+    open fun detect(ctx: JavaParser.StatBlockContext) {}
+    open fun detect(ctx: JavaParser.StatExpressionContext) {}
     open fun detect(ctx: JavaParser.ExprTypeCastContext) {}
+    open fun detect(ctx: JavaParser.ExprAssignmentContext) {}
+    open fun detect(ctx: JavaParser.LocalVariableDeclarationContext) {}
+    open fun detect(ctx: JavaParser.VariableDeclaratorContext) {}
 }
