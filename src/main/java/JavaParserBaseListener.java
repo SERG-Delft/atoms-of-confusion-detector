@@ -591,13 +591,49 @@ public class JavaParserBaseListener implements JavaParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIntegerLiteral(JavaParser.IntegerLiteralContext ctx) { }
+	@Override public void enterIntLitDecimal(JavaParser.IntLitDecimalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIntegerLiteral(JavaParser.IntegerLiteralContext ctx) { }
+	@Override public void exitIntLitDecimal(JavaParser.IntLitDecimalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIntLitHex(JavaParser.IntLitHexContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntLitHex(JavaParser.IntLitHexContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIntLitOctal(JavaParser.IntLitOctalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntLitOctal(JavaParser.IntLitOctalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIntLitBin(JavaParser.IntLitBinContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntLitBin(JavaParser.IntLitBinContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

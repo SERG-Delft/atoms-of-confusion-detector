@@ -286,10 +286,10 @@ literal
     ;
 
 integerLiteral
-    : DECIMAL_LITERAL
-    | HEX_LITERAL
-    | OCT_LITERAL
-    | BINARY_LITERAL
+    : DECIMAL_LITERAL   #intLitDecimal
+    | HEX_LITERAL       #intLitHex
+    | OCT_LITERAL       #intLitOctal
+    | BINARY_LITERAL    #intLitBin
     ;
 
 floatLiteral

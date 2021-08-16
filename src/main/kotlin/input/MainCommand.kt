@@ -11,6 +11,7 @@ import output.graph.ConfusionGraph
 import output.writers.CsvWriter
 import parsing.AtomsListener
 import parsing.ParsedFile
+import parsing.detectors.ChangeOfLiteralEncodingDetector
 import parsing.detectors.ConditionalOperatorDetector
 import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
@@ -56,6 +57,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         listener.registerDetector(ConditionalOperatorDetector(listener, confusionGraph))
         listener.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph))
         listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
+        listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
         listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
 
         // for each input stream get its parser

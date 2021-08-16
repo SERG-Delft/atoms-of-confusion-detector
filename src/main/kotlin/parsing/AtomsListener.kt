@@ -78,6 +78,10 @@ class AtomsListener : JavaParserBaseListener() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
+    override fun enterIntLitOctal(ctx: JavaParser.IntLitOctalContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
     override fun enterStatIfElse(ctx: JavaParser.StatIfElseContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
@@ -198,7 +202,7 @@ class AtomsListener : JavaParserBaseListener() {
     private fun updateScope(
         declarators: JavaParser.VariableDeclaratorsContext,
         type: Type,
-        constructor: (String, Type, String?) -> Symbol
+        constructor: (String, Type, String?) -> Symbol,
     ) {
         val lastChildIndex = declarators.childCount - 1
         var assignmentValueTextual: String? = null
