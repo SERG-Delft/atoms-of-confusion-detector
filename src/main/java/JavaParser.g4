@@ -497,7 +497,7 @@ expression
     | expression '[' accessAddr=expression ']'                      #exprArrayAccess
     | methodCall                                                    #exprMethodCall
     | NEW creator                                                   #exprNewExpression
-    | '(' annotation* typeType ')' subexpr=expression               #exprTypeCast
+    | '(' annotation* cast=typeType ')' subexpr=expression          #exprTypeCast
     | subexpr=expression postfix=('++' | '--')                      #exprPostfix
     | prefix=('+'|'-'|'++'|'--') subexpr=expression                 #exprPrefix
     | prefix=('~'|'!') subexpr=expression                           #exprPrefix

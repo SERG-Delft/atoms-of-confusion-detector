@@ -12,4 +12,5 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.ExprInfixBitshiftContext) {}
     open fun detect(ctx: JavaParser.ExprTernaryContext) {}
     open fun detect(ctx: JavaParser.IntLitOctalContext) {}
+    open fun detect(ctx: JavaParser.ExprTypeCastContext) {}
 }
