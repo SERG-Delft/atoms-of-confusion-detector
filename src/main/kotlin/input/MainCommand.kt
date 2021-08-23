@@ -18,6 +18,7 @@ import parsing.detectors.LogicAsControlFlowDetector
 import parsing.detectors.OmittedCurlyBracesDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
+import parsing.detectors.RemoveIndentationDetector
 import java.nio.file.Path
 
 /**
@@ -59,6 +60,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
         listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
         listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
+        listener.registerDetector(RemoveIndentationDetector(listener, confusionGraph))
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }

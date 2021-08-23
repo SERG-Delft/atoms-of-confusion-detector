@@ -1,5 +1,5 @@
-INFIX_OPERATOR_PRECEDENCE,testdata/myClass.java,[8]
-POST_INCREMENT_DECREMENT,testdata/myClass.java,"[5, 8]"
-PRE_INCREMENT_DECREMENT,testdata/myClass.java,[4]
-CONDITIONAL_OPERATOR,testdata/myClass.java,[12]
-LOGIC_AS_CONTROL_FLOW,testdata/myClass.java,[8]
+INFIX_OPERATOR_PRECEDENCE,testdata\myClass.java,[8]
+POST_INCREMENT_DECREMENT,testdata\myClass.java,"[5, 8]"
+PRE_INCREMENT_DECREMENT,testdata\myClass.java,[4]
+CONDITIONAL_OPERATOR,testdata\myClass.java,[12]
+LOGIC_AS_CONTROL_FLOW,testdata\myClass.java,[8]
