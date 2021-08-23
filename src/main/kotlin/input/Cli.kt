@@ -6,12 +6,9 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
-import com.github.kittinunf.fuel.core.isSuccessful
-import com.github.kittinunf.fuel.httpGet
+import github.GithubUtil
 import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.tree.ParseTreeWalker
-import org.jsoup.Jsoup
 import output.graph.ConfusionGraph
 import output.writers.CsvWriter
 import parsing.AtomsListener
@@ -21,7 +18,6 @@ import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
-import java.net.URI
 import java.nio.file.Path
 
 /**
@@ -91,55 +87,26 @@ class PRCommand : CliktCommand(help = "Analyze the provided github pull request 
 
     private val url: String by argument(help = "The github pr URL")
 
-    @SuppressWarnings("MagicNumber")
     override fun run() {
 
-        val uri = URI(url)
-        val path = uri.path.split("/")
+        // extract data from the pull request url
+        val pr = GithubUtil.getPullRequestInfo(url)
 
-        // val user = path[1]
-        val repo = path[2]
-        // val prNum = path[4]
+        // get changed files
+        val changedFiles = GithubUtil.getChangedFiles(pr.patch)
 
-        val doc = Jsoup.connect(url).get()
-        val elements = doc.select(".commit-ref")
-        val target = elements[0].text().split(":")
-        val source = elements[1].text().split(":")
-
-        val (targetRepoUsername, targetBranch) = target[0] to target[1]
-        val (sourceRepoUsername, sourceBranch) = source[0] to source[1]
-
-        val (request, response, result) = "$url.patch".httpGet().responseString()
-        val patch = result.component1()!!
-
-        val changedFiles = patch.split("\n")
-            .filter { it.length >= 3 && it.slice(0 until 3) == "+++" } // get lines starting with +++
-            .map { it.split(" ")[1] } // get the path, following the plus signs
-            .map { it.slice(2 until it.length) } // remove the b/ from each path
-
+        // get the source and target files
         val sourceFiles = mutableListOf<CharStream>()
         val targetFiles = mutableListOf<CharStream>()
 
         for (file in changedFiles) {
-
-            val url = "http://raw.githubusercontent.com/$targetRepoUsername/$repo/$targetBranch/$file"
-            val (_, response, result) = url.httpGet().responseString()
-
-            if (response.isSuccessful) {
-                val fileText = result.component1()!!
-                targetFiles.add(CharStreams.fromString(fileText))
-            }
+            val charStream = GithubUtil.downloadFile(pr.targetRepoUsername, pr.repoName, pr.targetBranch, file)
+            if (charStream != null) targetFiles.add(charStream)
         }
 
         for (file in changedFiles) {
-
-            val url = "http://raw.githubusercontent.com/$sourceRepoUsername/$repo/$sourceBranch/$file"
-            val (_, response, result) = url.httpGet().responseString()
-
-            if (response.isSuccessful) {
-                val fileText = result.component1()!!
-                sourceFiles.add(CharStreams.fromString(fileText))
-            }
+            val charStream = GithubUtil.downloadFile(pr.sourceRepoUsername, pr.repoName, pr.sourceBranch, file)
+            if (charStream != null) sourceFiles.add(charStream)
         }
     }
 }
