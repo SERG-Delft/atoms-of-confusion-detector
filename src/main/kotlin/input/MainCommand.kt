@@ -13,12 +13,15 @@ import parsing.AtomsListener
 import parsing.ParsedFile
 import parsing.detectors.ChangeOfLiteralEncodingDetector
 import parsing.detectors.ConditionalOperatorDetector
+import parsing.detectors.ConstantVariableDetector
+import parsing.detectors.IndentationDetector
 import parsing.detectors.InfixPrecedenceDetector
 import parsing.detectors.LogicAsControlFlowDetector
 import parsing.detectors.OmittedCurlyBracesDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
 import parsing.detectors.RemoveIndentationDetector
+import parsing.detectors.TypeConversionDetector
 import java.nio.file.Path
 
 /**
@@ -61,6 +64,9 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
         listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
         listener.registerDetector(RemoveIndentationDetector(listener, confusionGraph))
+        listener.registerDetector(IndentationDetector(listener, confusionGraph))
+        listener.registerDetector(TypeConversionDetector(listener, confusionGraph))
+        listener.registerDetector(ConstantVariableDetector(listener, confusionGraph))
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
