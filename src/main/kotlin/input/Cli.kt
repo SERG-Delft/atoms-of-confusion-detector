@@ -6,8 +6,8 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import github.GitFile
 import github.GithubUtil
-import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import output.graph.ConfusionGraph
 import output.writers.CsvWriter
@@ -93,20 +93,72 @@ class PRCommand : CliktCommand(help = "Analyze the provided github pull request 
         val pr = GithubUtil.getPullRequestInfo(url)
 
         // get changed files
-        val changedFiles = GithubUtil.getChangedFiles(pr.patch)
+        val javaFiles = GithubUtil.getChangedJavaFiles(pr.patch)
 
         // get the source and target files
-        val sourceFiles = mutableListOf<CharStream>()
-        val targetFiles = mutableListOf<CharStream>()
+        val sourceFiles = mutableListOf<GitFile>()
+        val targetFiles = mutableListOf<GitFile>()
 
-        for (file in changedFiles) {
-            val charStream = GithubUtil.downloadFile(pr.targetRepoUsername, pr.repoName, pr.targetBranch, file)
-            if (charStream != null) targetFiles.add(charStream)
+        for (filePath in javaFiles) {
+            val downloadedFile = GithubUtil.downloadFile(
+                pr.targetBranch.repo.user,
+                pr.targetBranch.repo.name,
+                pr.targetBranch.branch,
+                filePath
+            )
+            if (downloadedFile != null) targetFiles.add(downloadedFile)
         }
 
-        for (file in changedFiles) {
-            val charStream = GithubUtil.downloadFile(pr.sourceRepoUsername, pr.repoName, pr.sourceBranch, file)
-            if (charStream != null) sourceFiles.add(charStream)
+        for (filePath in javaFiles) {
+            val downloadedFile = GithubUtil.downloadFile(
+                pr.sourceBranch.repo.user,
+                pr.sourceBranch.repo.name,
+                pr.sourceBranch.branch,
+                filePath
+            )
+            if (downloadedFile != null) sourceFiles.add(downloadedFile)
         }
+
+        val confusionGraph = ConfusionGraph(sourceFiles.map { it.path })
+        val listener = AtomsListener()
+
+        listener.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph))
+        listener.registerDetector(InfixPrecedenceDetector(listener, confusionGraph))
+        listener.registerDetector(ConditionalOperatorDetector(listener, confusionGraph))
+        listener.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph))
+        listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
+
+        println("analyzing source files...")
+
+        sourceFiles.forEach {
+            val file = ParsedFile(it.contents)
+            listener.fileName = it.path
+            val tree = file.parser.compilationUnit()
+            val walker = ParseTreeWalker()
+            walker.walk(listener, tree)
+        }
+
+        CsvWriter.outputData(confusionGraph, "source")
+
+        println("analyzing target files...")
+
+        val confusionGraph2 = ConfusionGraph(sourceFiles.map { it.path })
+        val listener2 = AtomsListener()
+
+        listener2.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph2))
+        listener2.registerDetector(InfixPrecedenceDetector(listener, confusionGraph2))
+        listener2.registerDetector(ConditionalOperatorDetector(listener, confusionGraph2))
+        listener2.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph2))
+        listener2.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph2))
+
+        targetFiles.forEach {
+            val file = ParsedFile(it.contents)
+            listener2.fileName = it.path
+            val tree = file.parser.compilationUnit()
+            val walker = ParseTreeWalker()
+            walker.walk(listener2, tree)
+        }
+
+        CsvWriter.outputData(confusionGraph2, "target")
     }
 }
