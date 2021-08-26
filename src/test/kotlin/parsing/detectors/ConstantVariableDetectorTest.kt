@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 internal class ConstantVariableDetectorTest : DetectorTest() {
 
-    fun testGetIdentifiersInExpression(expr: String, vararg expected: String) {
+    private fun testGetIdentifiersInExpression(expr: String, vararg expected: String) {
         val file = ParsedFile(CharStreams.fromString(expr))
         val tree = file.parser.expression() as JavaParser.ExprInfixContext
 

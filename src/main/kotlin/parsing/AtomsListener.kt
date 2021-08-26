@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
+import parsing.symtab.SymtabUtil
 import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
@@ -121,7 +122,8 @@ class AtomsListener : JavaParserBaseListener() {
 
     override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
         val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
-        val function = AtomsMethodSymbol(ctx.IDENTIFIER().toString(), type, mutableSetOf())
+        val symbolName = SymtabUtil.getMethodSymbolId(ctx)
+        val function = AtomsMethodSymbol(symbolName, type, mutableSetOf())
         setupNewSymbol(function)
     }
 
