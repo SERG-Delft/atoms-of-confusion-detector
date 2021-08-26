@@ -1,10 +1,24 @@
 package parsing.detectors
 
+import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import parsing.ParsedFile
 import kotlin.test.assertEquals
 
 internal class ConstantVariableDetectorTest : DetectorTest() {
+
+    fun testGetIdentifiersInExpression(expr: String, vararg expected: String) {
+        val file = ParsedFile(CharStreams.fromString(expr))
+        val tree = file.parser.expression() as JavaParser.ExprInfixContext
+
+        val d = ConstantVariableDetector(listener, graph)
+        listener.parsedFile = file
+        listener.fileName = "f1"
+        val actual = d.getVariablesInExpression(tree).map { it.text }.toSet()
+
+        assertEquals(expected.toSet(), actual)
+    }
 
     @BeforeEach
     fun setup() {
@@ -211,5 +225,25 @@ internal class ConstantVariableDetectorTest : DetectorTest() {
             "}"
         val atoms = runVisitorFile(code)
         assertAtom(atoms, "CONSTANT_VARIABLES")
+    }
+
+    @Test
+    fun testVarResolvingSimple() {
+        testGetIdentifiersInExpression("a + b", "a", "b")
+    }
+
+    @Test
+    fun testVarResolvingMemberAccess() {
+        testGetIdentifiersInExpression("a + b.foo", "a")
+    }
+
+    @Test
+    fun testVarResolvingMethodCall() {
+        testGetIdentifiersInExpression("a + b.foo()", "a")
+    }
+
+    @Test
+    fun testVarNestedMember() {
+        testGetIdentifiersInExpression("a + b.a.b", "a")
     }
 }

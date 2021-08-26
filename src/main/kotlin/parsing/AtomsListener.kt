@@ -130,7 +130,11 @@ class AtomsListener : JavaParserBaseListener() {
             ctx.variableDeclaratorId().text,
             TypeResolver.resolveType(ctx.typeType().text)
         )
-        (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+
+        if (currentScope is AtomsMethodSymbol) {
+            (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+        }
+
         currentScope?.define(parameter)
     }
 

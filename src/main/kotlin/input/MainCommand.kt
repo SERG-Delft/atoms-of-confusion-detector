@@ -72,6 +72,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         val parsers = classResolver.streams.map { ParsedFile(it) }
         parsers.forEach {
             listener.setFile(it)
+            println("analyzing ${it.stream.sourceName}...")
             ParseTreeWalker().walk(listener, it.parser.compilationUnit())
         }
 
