@@ -14,6 +14,7 @@ import parsing.detectors.Detector
 import parsing.detectors.Visit
 import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
+import parsing.symtab.symbols.AtomsConstructorSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
 import parsing.symtab.symbols.AtomsMethodSymbol
 import parsing.symtab.symbols.AtomsParameterSymbol
@@ -125,14 +126,20 @@ class AtomsListener : JavaParserBaseListener() {
         setupNewSymbol(function)
     }
 
+    override fun enterConstructorDeclaration(ctx: JavaParser.ConstructorDeclarationContext) {
+        val constructor = AtomsConstructorSymbol(ctx.text, mutableSetOf())
+        setupNewSymbol(constructor)
+    }
+
     override fun enterFormalParameter(ctx: JavaParser.FormalParameterContext) {
         val parameter = AtomsParameterSymbol(
             ctx.variableDeclaratorId().text,
             TypeResolver.resolveType(ctx.typeType().text)
         )
 
-        if (currentScope is AtomsMethodSymbol) {
-            (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+        when (currentScope) {
+            is AtomsMethodSymbol -> (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+            is AtomsConstructorSymbol -> (currentScope as AtomsConstructorSymbol).parameters.add(parameter)
         }
 
         currentScope?.define(parameter)
