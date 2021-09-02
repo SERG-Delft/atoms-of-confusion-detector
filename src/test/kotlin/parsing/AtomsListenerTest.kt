@@ -14,6 +14,7 @@ import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
 import parsing.symtab.symbols.AtomsParameterSymbol
+import parsing.symtab.types.ReferenceType
 
 internal class AtomsListenerTest {
 
@@ -127,6 +128,54 @@ internal class AtomsListenerTest {
         val (walker, graph, file) = parse(code)
         val expected = AtomsLocalVariableSymbol("localVar", PrimitiveType("boolean"), "false")
         val detector = TestDetector(listener, graph, expected, "localVar")
+        listener.registerDetector(detector)
+        walker.walk(listener, file.parser.compilationUnit())
+    }
+
+    @Test
+    fun testConstructorShadowsField() {
+        val code =
+            """
+            private static class Option {
+                private String id;
+                private int minSdk;
+                private int minBuild;
+                
+                public Option(String id, int minSdk, int minBuild) {
+                    this.id = id;
+                    this.minSdk = minSdk;
+                    this.minBuild = minBuild;
+                    this.minSdk++;
+                }
+            } 
+            """
+        val (walker, graph, file) = parse(code)
+        val expected = AtomsParameterSymbol("id", ReferenceType("String"))
+        val detector = TestDetector(listener, graph, expected, "id")
+        listener.registerDetector(detector)
+        walker.walk(listener, file.parser.compilationUnit())
+    }
+
+    @Test
+    fun testMethodParamShadowsField() {
+        val code =
+            """
+            private static class Option {
+                private String id;
+                private int minSdk;
+                private int minBuild;
+                
+                public void magicFoo(String id, int minSdk, int minBuild) {
+                    this.id = id;
+                    this.minSdk = minSdk;
+                    this.minBuild = minBuild;
+                    this.minSdk++;
+                }
+            } 
+            """
+        val (walker, graph, file) = parse(code)
+        val expected = AtomsParameterSymbol("minSdk", PrimitiveType("int"))
+        val detector = TestDetector(listener, graph, expected, "minSdk")
         listener.registerDetector(detector)
         walker.walk(listener, file.parser.compilationUnit())
     }
