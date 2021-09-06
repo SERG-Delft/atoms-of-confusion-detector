@@ -212,7 +212,6 @@ internal class AtomsListenerTest {
         walker.walk(listener, file.parser.methodDeclaration())
     }
 
-
     @Test
     fun testDoubleEnhancedFor() {
         val code = """
@@ -251,8 +250,7 @@ internal class AtomsListenerTest {
         val detector = TestDetector(listener, graph, expected, "minSdk")
         listener.registerDetector(detector)
         walker.walk(listener, file.parser.compilationUnit())
-   }
-
+    }
 
     @Test
     fun testAnonymousInnerClass() {

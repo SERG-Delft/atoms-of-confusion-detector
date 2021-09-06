@@ -119,11 +119,13 @@ class AtomsListener : JavaParserBaseListener() {
         popScope()
     }
 
-    override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
-        val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
-        val symbolName = SymtabUtil.getMethodSymbolId(ctx)
-        val function = AtomsMethodSymbol(symbolName, type, mutableSetOf())
-        setupNewSymbol(function)
+    override fun enterClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
+        val newSymbol = ClassSymbol("Anonymous-Class@${ctx.start.line}")
+        setupNewSymbol(newSymbol)
+    }
+
+    override fun exitClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
+        popScope()
     }
 
     override fun enterInterfaceMethodDeclaration(ctx: JavaParser.InterfaceMethodDeclarationContext) {
@@ -156,6 +158,13 @@ class AtomsListener : JavaParserBaseListener() {
         currentScope?.define(parameter)
     }
 
+    override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
+        val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
+        val symbolName = SymtabUtil.getMethodSymbolId(ctx)
+        val function = AtomsMethodSymbol(symbolName, type, mutableSetOf())
+        setupNewSymbol(function)
+    }
+
     override fun exitMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
         popScope()
     }
@@ -170,7 +179,8 @@ class AtomsListener : JavaParserBaseListener() {
         val localScope = LocalScope(currentScope)
         pushScope(localScope)
 
-        val grandpa = ctx.parent.parent
+        val parent = ctx.parent ?: return
+        val grandpa = parent.parent ?: return
 
         if (grandpa is JavaParser.StatForContext) {
 
@@ -187,9 +197,11 @@ class AtomsListener : JavaParserBaseListener() {
             // standard for control
             if (forControl is JavaParser.ForCtrlStandardContext) {
 
-                val initializer = forControl.init
+                val initializer = forControl.init ?: return
 
-                if (initializer.children[0] is JavaParser.LocalVariableDeclarationContext) {
+                if (initializer.children.size > 0 &&
+                    initializer.children[0] is JavaParser.LocalVariableDeclarationContext
+                ) {
                     val localDecl = initializer.children[0] as JavaParser.LocalVariableDeclarationContext
                     val type = TypeResolver.resolveType(localDecl.typeType().text)
                     val declarators = localDecl.variableDeclarators()
