@@ -215,7 +215,7 @@ internal class AtomsListenerTest {
     @Test
     fun testDoubleEnhancedFor() {
         val code = """
-       void foo() {
+        void foo() {
 
             for (int i : arr) {
                 if (true) a();
@@ -225,8 +225,8 @@ internal class AtomsListenerTest {
 
             for (int i : arr) {
             }
-    }
-        """
+       }
+       """
 
         val (walker, graph, file) = parse(code)
         val expected = AtomsClassFieldSymbol("classField", PrimitiveType("int"), null)

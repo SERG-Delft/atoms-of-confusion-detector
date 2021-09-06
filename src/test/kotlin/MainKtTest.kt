@@ -89,13 +89,13 @@ internal class MainKtTest {
 
     // Integration tests
 
-//    @Test
-//    fun test() {
-//        main(arrayOf("-v", "testdata/android/TrackBrowserActivity_new-8ea4825646579dc525a0115ce633a63a.java"))
-//    }
-//
-//    @Test
-//    fun testOnAndroidProject() {
-//        main(arrayOf("-r", "-v", "testdata/android"))
-//    }
+    @Test
+    fun test() {
+        main(arrayOf("-v", "-r", "testdata/android/Daemons_old-c38a860fb0c1b21a7186e7f27438b435.java"))
+    }
+
+    @Test
+    fun testOnAndroidProject() {
+        main(arrayOf("-r", "-v", "testdata/android"))
+    }
 }

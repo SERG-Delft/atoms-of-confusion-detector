@@ -120,11 +120,17 @@ class AtomsListener : JavaParserBaseListener() {
     }
 
     override fun enterClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
-        val newSymbol = ClassSymbol("Anonymous-Class@${ctx.start.line}")
+        if (ctx.classBody() == null) {
+            return
+        }
+        val newSymbol = ClassSymbol("Anonymous-Class@${ctx.start.line}:${ctx.start.charPositionInLine}")
         setupNewSymbol(newSymbol)
     }
 
     override fun exitClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
+        if (ctx.classBody() == null) {
+            return
+        }
         popScope()
     }
 
@@ -243,7 +249,6 @@ class AtomsListener : JavaParserBaseListener() {
 
     override fun enterLocalVariableDeclaration(ctx: JavaParser.LocalVariableDeclarationContext) {
         // scoping logic
-
         if (ctx.parent.parent !is JavaParser.ForControlContext) {
             val type = TypeResolver.resolveType(ctx.typeType().text)
             val declarators = ctx.variableDeclarators()
@@ -297,5 +302,10 @@ class AtomsListener : JavaParserBaseListener() {
                 currentScope?.define(symbol)
             }
         }
+    }
+
+    // clear the scope when leaving a compilation unit
+    override fun exitCompilationUnit(ctx: JavaParser.CompilationUnitContext) {
+        currentScope = null
     }
 }

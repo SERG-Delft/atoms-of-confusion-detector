@@ -74,8 +74,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         val parsers = classResolver.streams.map { ParsedFile(it) }
         var filesAnalyzed = 0
         val errorString = StringBuilder()
-        errorString.append("==================Synopsis=====================\n")
-        val exceptions = mutableListOf<String>()
+        errorString.append("==================Log=====================\n")
         parsers.forEach {
             try {
                 listener.setFile(it)
@@ -83,20 +82,15 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
                 ParseTreeWalker().walk(listener, it.parser.compilationUnit())
                 filesAnalyzed++
             } catch (e: Exception) {
-                // this is a generic exception to account for anything that could go wrong
+                // this catches a generic exception to account for anything that could go wrong
                 // when the tool is in verbose mode the exceptions are logged in a file that
                 // is created in the end of the analysis
-                errorString.append("Failed to analyse file: ${it.stream.sourceName}\n")
-                exceptions.add("Failed to analyse file: ${it.stream.sourceName} due to: \n ${e.message}\n")
+                errorString.append("Failed to analyse file: ${it.stream.sourceName} due to: \n ${e.message}\n")
             }
             CsvWriter.outputData(confusionGraph)
         }
         if (verboseFlag) {
             errorString.append("Successfully analysed $filesAnalyzed/${parsers.size} files\n")
-            errorString.append("===============End Synopsis====================\n")
-            errorString.append("================Error Log======================\n")
-            exceptions.forEach { errorString.append(it) }
-            errorString.append("================End Error Log==================\n")
             val logFile = File("AtomsAnalysisLog.txt")
             logFile.createNewFile()
             logFile.writeText(errorString.toString())
