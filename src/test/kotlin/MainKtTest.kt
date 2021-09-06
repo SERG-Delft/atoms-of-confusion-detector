@@ -10,6 +10,8 @@ import kotlin.test.assertTrue
 
 internal class MainKtTest {
 
+    // CLI tests:
+
     @BeforeEach
     fun setup() {
         Settings.VERBOSE = false
@@ -83,5 +85,18 @@ internal class MainKtTest {
         assertThrows<BadParameterValue> {
             main(arrayOf("testdata/missing.java"))
         }
+    }
+
+    // Integration tests
+
+
+    @Test
+    fun test() {
+        main(arrayOf("testdata/android/TrackBrowserActivity_new-8ea4825646579dc525a0115ce633a63a.java"))
+    }
+//
+    @Test
+    fun testOnAndroidProject() {
+        main(arrayOf("-r", "testdata/android"))
     }
 }

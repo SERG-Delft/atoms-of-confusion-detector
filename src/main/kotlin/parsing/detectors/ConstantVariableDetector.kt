@@ -74,8 +74,11 @@ class ConstantVariableDetector(listener: AtomsListener, graph: ConfusionGraph) :
             false // use this to keep track of whether one of the identifiers does not resolve to a literal
         var constantVariablesCounter = 0 // counts the #appearances of the atom
         identifiers.forEach {
-            val resolvedSymbol = listener.currentScope?.resolve(it.text)
+
+            // sometimes he symbol fails to be resolved, for instance if it was imported statically, then return
+            val resolvedSymbol = listener.currentScope?.resolve(it.text) ?: return@forEach
             resolvedSymbol as AtomsBaseSymbol
+
             if (isLiteral(resolvedSymbol.parseTreeNodeValue)) {
                 constantVariablesCounter++
             } else {

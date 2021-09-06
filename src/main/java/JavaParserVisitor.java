@@ -607,23 +607,25 @@ public interface JavaParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSwitchLabel(JavaParser.SwitchLabelContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link JavaParser#forControl}.
+	 * Visit a parse tree produced by the {@code forCtrlEnhanced}
+	 * labeled alternative in {@link JavaParser#forControl}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForControl(JavaParser.ForControlContext ctx);
+	T visitForCtrlEnhanced(JavaParser.ForCtrlEnhancedContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forCtrlStandard}
+	 * labeled alternative in {@link JavaParser#forControl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForCtrlStandard(JavaParser.ForCtrlStandardContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#forInit}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitForInit(JavaParser.ForInitContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link JavaParser#enhancedForControl}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEnhancedForControl(JavaParser.EnhancedForControlContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JavaParser#parExpression}.
 	 * @param ctx the parse tree
