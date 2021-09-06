@@ -86,16 +86,4 @@ internal class MainKtTest {
             main(arrayOf("testdata/missing.java"))
         }
     }
-
-    // Integration tests
-
-    @Test
-    fun test() {
-        main(arrayOf("-v", "-r", "testdata/android/Daemons_old-c38a860fb0c1b21a7186e7f27438b435.java"))
-    }
-
-    @Test
-    fun testOnAndroidProject() {
-        main(arrayOf("-r", "-v", "testdata/android"))
-    }
 }
