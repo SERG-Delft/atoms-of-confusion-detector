@@ -10,6 +10,8 @@ import kotlin.test.assertTrue
 
 internal class MainKtTest {
 
+    // CLI tests:
+
     @BeforeEach
     fun setup() {
         Settings.VERBOSE = false

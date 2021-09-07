@@ -441,17 +441,13 @@ switchLabel
     ;
 
 forControl
-    : enhancedForControl
-    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList?
+    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression #forCtrlEnhanced
+    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList? #forCtrlStandard
     ;
 
 forInit
     : localVariableDeclaration
     | expressionList
-    ;
-
-enhancedForControl
-    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression
     ;
 
 // EXPRESSIONS

@@ -1167,13 +1167,25 @@ public class JavaParserBaseListener implements JavaParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterForControl(JavaParser.ForControlContext ctx) { }
+	@Override public void enterForCtrlEnhanced(JavaParser.ForCtrlEnhancedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitForControl(JavaParser.ForControlContext ctx) { }
+	@Override public void exitForCtrlEnhanced(JavaParser.ForCtrlEnhancedContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForCtrlStandard(JavaParser.ForCtrlStandardContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForCtrlStandard(JavaParser.ForCtrlStandardContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1186,18 +1198,6 @@ public class JavaParserBaseListener implements JavaParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitForInit(JavaParser.ForInitContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterEnhancedForControl(JavaParser.EnhancedForControlContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEnhancedForControl(JavaParser.EnhancedForControlContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -12,8 +12,10 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.TokenStream
 import parsing.detectors.Detector
 import parsing.detectors.Visit
+import parsing.symtab.SymtabUtil
 import parsing.symtab.symbols.AtomsBaseSymbol
 import parsing.symtab.symbols.AtomsClassFieldSymbol
+import parsing.symtab.symbols.AtomsConstructorSymbol
 import parsing.symtab.symbols.AtomsLocalVariableSymbol
 import parsing.symtab.symbols.AtomsMethodSymbol
 import parsing.symtab.symbols.AtomsParameterSymbol
@@ -54,6 +56,8 @@ class AtomsListener : JavaParserBaseListener() {
         }
     }
 
+    // Running detectors
+
     override fun enterExprPostfix(ctx: JavaParser.ExprPostfixContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
@@ -86,10 +90,6 @@ class AtomsListener : JavaParserBaseListener() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
-    override fun enterStatFor(ctx: JavaParser.StatForContext) {
-        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
-    }
-
     override fun enterStatWhile(ctx: JavaParser.StatWhileContext) {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
@@ -119,10 +119,35 @@ class AtomsListener : JavaParserBaseListener() {
         popScope()
     }
 
-    override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
+    override fun enterClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
+        if (ctx.classBody() == null) {
+            return
+        }
+        val newSymbol = ClassSymbol("Anonymous-Class@${ctx.start.line}:${ctx.start.charPositionInLine}")
+        setupNewSymbol(newSymbol)
+    }
+
+    override fun exitClassCreatorRest(ctx: JavaParser.ClassCreatorRestContext) {
+        if (ctx.classBody() == null) {
+            return
+        }
+        popScope()
+    }
+
+    override fun enterInterfaceMethodDeclaration(ctx: JavaParser.InterfaceMethodDeclarationContext) {
         val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
-        val function = AtomsMethodSymbol(ctx.IDENTIFIER().toString(), type, mutableSetOf())
+        val symbolName = SymtabUtil.getInterfaceMethodSymbolId(ctx)
+        val function = AtomsMethodSymbol(symbolName, type, mutableSetOf())
         setupNewSymbol(function)
+    }
+
+    override fun exitInterfaceDeclaration(ctx: JavaParser.InterfaceDeclarationContext) {
+        popScope()
+    }
+
+    override fun enterConstructorDeclaration(ctx: JavaParser.ConstructorDeclarationContext) {
+        val constructor = AtomsConstructorSymbol(ctx.text, mutableSetOf())
+        setupNewSymbol(constructor)
     }
 
     override fun enterFormalParameter(ctx: JavaParser.FormalParameterContext) {
@@ -130,20 +155,74 @@ class AtomsListener : JavaParserBaseListener() {
             ctx.variableDeclaratorId().text,
             TypeResolver.resolveType(ctx.typeType().text)
         )
-        (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+
+        when (currentScope) {
+            is AtomsMethodSymbol -> (currentScope as AtomsMethodSymbol).parameters.add(parameter)
+            is AtomsConstructorSymbol -> (currentScope as AtomsConstructorSymbol).parameters.add(parameter)
+        }
+
         currentScope?.define(parameter)
+    }
+
+    override fun enterMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
+        val type = TypeResolver.resolveType(ctx.typeTypeOrVoid().text)
+        val symbolName = SymtabUtil.getMethodSymbolId(ctx)
+        val function = AtomsMethodSymbol(symbolName, type, mutableSetOf())
+        setupNewSymbol(function)
     }
 
     override fun exitMethodDeclaration(ctx: JavaParser.MethodDeclarationContext) {
         popScope()
     }
 
-    override fun enterBlock(ctx: JavaParser.BlockContext?) {
-        val localScope = LocalScope(currentScope)
-        pushScope(localScope)
+    override fun enterVariableDeclarator(ctx: JavaParser.VariableDeclaratorContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
-    override fun exitBlock(ctx: JavaParser.BlockContext?) {
+    // Scoping
+
+    override fun enterBlock(ctx: JavaParser.BlockContext) {
+        val localScope = LocalScope(currentScope)
+        pushScope(localScope)
+
+        val parent = ctx.parent ?: return
+        val grandpa = parent.parent ?: return
+
+        if (grandpa is JavaParser.StatForContext) {
+
+            val forControl = grandpa.forCtrl
+
+            // enhanced for loop
+            if (forControl is JavaParser.ForCtrlEnhancedContext) {
+                val identifier = forControl.id.text
+                val type = TypeResolver.resolveType(forControl.type.text)
+                val localVar = AtomsLocalVariableSymbol(identifier, type, null)
+                currentScope?.define(localVar)
+            }
+
+            // standard for control
+            if (forControl is JavaParser.ForCtrlStandardContext) {
+
+                val initializer = forControl.init ?: return
+
+                if (initializer.children.size > 0 &&
+                    initializer.children[0] is JavaParser.LocalVariableDeclarationContext
+                ) {
+                    val localDecl = initializer.children[0] as JavaParser.LocalVariableDeclarationContext
+                    val type = TypeResolver.resolveType(localDecl.typeType().text)
+                    val declarators = localDecl.variableDeclarators()
+                    val constructor = { i: String, t: Type, v: String? -> AtomsLocalVariableSymbol(i, t, v) }
+                    updateScope(declarators, type, constructor)
+                }
+            }
+        }
+    }
+
+    override fun enterStatFor(ctx: JavaParser.StatForContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
+    override fun exitBlock(ctx: JavaParser.BlockContext) {
         popScope()
     }
 
@@ -170,15 +249,14 @@ class AtomsListener : JavaParserBaseListener() {
 
     override fun enterLocalVariableDeclaration(ctx: JavaParser.LocalVariableDeclarationContext) {
         // scoping logic
-        val type = TypeResolver.resolveType(ctx.typeType().text)
-        val declarators = ctx.variableDeclarators()
-        val constructor = { i: String, t: Type, v: String? -> AtomsLocalVariableSymbol(i, t, v) }
-        updateScope(declarators, type, constructor)
-        // detecting logic
-        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
-    }
+        if (ctx.parent.parent !is JavaParser.ForControlContext) {
+            val type = TypeResolver.resolveType(ctx.typeType().text)
+            val declarators = ctx.variableDeclarators()
+            val constructor = { i: String, t: Type, v: String? -> AtomsLocalVariableSymbol(i, t, v) }
+            updateScope(declarators, type, constructor)
+        }
 
-    override fun enterVariableDeclarator(ctx: JavaParser.VariableDeclaratorContext) {
+        // detecting logic
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
@@ -224,5 +302,10 @@ class AtomsListener : JavaParserBaseListener() {
                 currentScope?.define(symbol)
             }
         }
+    }
+
+    // clear the scope when leaving a compilation unit
+    override fun exitCompilationUnit(ctx: JavaParser.CompilationUnitContext) {
+        currentScope = null
     }
 }

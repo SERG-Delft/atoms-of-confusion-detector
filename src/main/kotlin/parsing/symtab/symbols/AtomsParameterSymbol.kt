@@ -1,9 +1,11 @@
 package parsing.symtab.symbols
 
+import org.antlr.symtab.MemberSymbol
 import org.antlr.symtab.Type
 
 class AtomsParameterSymbol(override val myName: String, override val myType: Type) :
-    AtomsBaseSymbol(myName, myType, null) {
+    AtomsBaseSymbol(myName, myType, null),
+    MemberSymbol {
 
     init {
         super.type = myType
@@ -24,4 +26,7 @@ class AtomsParameterSymbol(override val myName: String, override val myType: Typ
         result = 31 * result + myType.hashCode()
         return result
     }
+
+    // here just so that we implement MemberSymbol
+    override fun getSlotNumber() = 0
 }

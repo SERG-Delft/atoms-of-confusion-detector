@@ -1,7 +1,6 @@
 package parsing.detectors
 
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.xpath.XPath
 import output.Atom
 import output.graph.ConfusionGraph
@@ -17,6 +16,10 @@ import parsing.symtab.symbols.AtomsBaseSymbol
 class ConstantVariableDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
 
     override fun detect(ctx: JavaParser.VariableDeclaratorContext) {
+
+        // we only care about variable initializers, not array initializers
+        if (ctx.variableInitializer() == null) return
+
         val initializerExpression = ctx.variableInitializer().expression()
         val line = ctx.start.line
         if (initializerExpression is JavaParser.ExprIdentifierContext) {
@@ -66,13 +69,16 @@ class ConstantVariableDetector(listener: AtomsListener, graph: ConfusionGraph) :
             // this also ensures that the rest of the code run only for top level infix expressions
             return
         }
-        val identifiers = getIdentifiersInExpression(ctx)
+        val identifiers = getVariablesInExpression(ctx)
         var containsNonLiteralIdentifier =
             false // use this to keep track of whether one of the identifiers does not resolve to a literal
         var constantVariablesCounter = 0 // counts the #appearances of the atom
-        identifiers?.forEach {
-            val resolvedSymbol = listener.currentScope?.resolve(it.text)
+        identifiers.forEach {
+
+            // sometimes he symbol fails to be resolved, for instance if it was imported statically, then return
+            val resolvedSymbol = listener.currentScope?.resolve(it.text) ?: return@forEach
             resolvedSymbol as AtomsBaseSymbol
+
             if (isLiteral(resolvedSymbol.parseTreeNodeValue)) {
                 constantVariablesCounter++
             } else {
@@ -92,8 +98,16 @@ class ConstantVariableDetector(listener: AtomsListener, graph: ConfusionGraph) :
         }
     }
 
-    private fun getIdentifiersInExpression(ctx: JavaParser.ExprInfixContext): MutableCollection<ParseTree>? {
-        return XPath.findAll(ctx, "//IDENTIFIER", listener.parsedFile.parser)
+    /**
+     * Extract all of the variable literals in the expression
+     *
+     * @param ctx an infix expression
+     * @return a list of ExprIdentifiers corresponding to variable literals in ctx
+     */
+    fun getVariablesInExpression(ctx: JavaParser.ExprInfixContext): List<JavaParser.ExprIdentifierContext> {
+        return XPath.findAll(ctx, "//expression", listener.parsedFile.parser)
+            .filterIsInstance<JavaParser.ExprIdentifierContext>()
+            .filter { it.parent !is JavaParser.ExprDotAccessContext }
     }
 
     private fun isLiteral(ctx: ParserRuleContext?): Boolean {

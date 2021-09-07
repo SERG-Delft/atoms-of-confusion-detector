@@ -22,6 +22,7 @@ import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
 import parsing.detectors.RemoveIndentationDetector
 import parsing.detectors.TypeConversionDetector
+import java.io.File
 import java.nio.file.Path
 
 /**
@@ -43,6 +44,7 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
         .path(mustExist = true, mustBeReadable = true)
         .multiple(required = true)
 
+    @Suppress("TooGenericExceptionCaught")
     override fun run() {
         Settings.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
         Settings.VERBOSE = verboseFlag
@@ -70,11 +72,28 @@ class MainCommand : CliktCommand(help = "Analyze the provided files for atoms of
 
         // for each input stream get its parser
         val parsers = classResolver.streams.map { ParsedFile(it) }
+        var filesAnalyzed = 0
+        val errorString = StringBuilder()
+        errorString.append("==================Log=====================\n")
         parsers.forEach {
-            listener.setFile(it)
-            ParseTreeWalker().walk(listener, it.parser.compilationUnit())
+            try {
+                listener.setFile(it)
+                if (verboseFlag) println("analyzing ${it.stream.sourceName}...")
+                ParseTreeWalker().walk(listener, it.parser.compilationUnit())
+                filesAnalyzed++
+            } catch (e: Exception) {
+                // this catches a generic exception to account for anything that could go wrong
+                // when the tool is in verbose mode the exceptions are logged in a file that
+                // is created in the end of the analysis
+                errorString.append("Failed to analyse file: ${it.stream.sourceName} due to: \n ${e.message}\n")
+            }
+            CsvWriter.outputData(confusionGraph)
         }
-
-        CsvWriter.outputData(confusionGraph)
+        if (verboseFlag) {
+            errorString.append("Successfully analysed $filesAnalyzed/${parsers.size} files\n")
+            val logFile = File("AtomsAnalysisLog.txt")
+            logFile.createNewFile()
+            logFile.writeText(errorString.toString())
+        }
     }
 }
