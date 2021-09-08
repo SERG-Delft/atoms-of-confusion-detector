@@ -15,4 +15,6 @@ object Settings {
     var VERBOSE = false
     // defines the name of the output
     var OUTPUT = "atoms-of-confusion-analysis"
+    // controls if the tool logs errors
+    var LOG = false
 }

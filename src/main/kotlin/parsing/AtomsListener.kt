@@ -38,7 +38,7 @@ class AtomsListener : JavaParserBaseListener() {
      * @pa
      */
     fun setFile(file: ParsedFile) {
-        fileName = file.stream.sourceName
+        fileName = file.name
         this.tokens = file.tokens
         this.parsedFile = file
     }
