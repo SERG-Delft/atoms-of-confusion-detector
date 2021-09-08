@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import parsing.ParsedFile
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
 import java.net.URI
@@ -158,13 +159,15 @@ sealed class GithubUtil {
          * @param filePath
          * @return a GitFile for the specified file, null if not found
          */
-        fun downloadFile(user: String, repo: String, branch: String, filePath: String): GitFile? {
+        fun downloadFile(user: String, repo: String, branch: String, filePath: String): ParsedFile? {
 
             val url = "http://raw.githubusercontent.com/$user/$repo/$branch/$filePath"
             val (_, response, result) = url.httpGet().responseString()
             return if (response.isSuccessful) {
                 val charStream = CharStreams.fromString(result.component1()!!)
-                GitFile(filePath, charStream)
+                val parsedFile = ParsedFile(charStream)
+                parsedFile.name = filePath
+                parsedFile
             } else {
                 null
             }

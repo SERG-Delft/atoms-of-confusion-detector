@@ -24,6 +24,6 @@ object CsvWriter {
      */
     fun outputData(graph: ConfusionGraph, filename: String) {
         val rows = graph.getAllAtomAppearances()
-        csvWriter().writeAll(rows, "$filename.csv")
+        csvWriter().writeAll(rows, filename)
     }
 }

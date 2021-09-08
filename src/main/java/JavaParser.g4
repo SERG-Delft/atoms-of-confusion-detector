@@ -286,10 +286,10 @@ literal
     ;
 
 integerLiteral
-    : DECIMAL_LITERAL
-    | HEX_LITERAL
-    | OCT_LITERAL
-    | BINARY_LITERAL
+    : DECIMAL_LITERAL   #intLitDecimal
+    | HEX_LITERAL       #intLitHex
+    | OCT_LITERAL       #intLitOctal
+    | BINARY_LITERAL    #intLitBin
     ;
 
 floatLiteral
@@ -387,7 +387,7 @@ localTypeDeclaration
 statement
     : blockLabel=block                                                      #statBlock
     | ASSERT expression (':' expression)? ';'                               #statAssert
-    | IF condition=parExpression body=statement (ELSE statement)?           #statIfElse
+    | IF condition=parExpression ifBody=statement (ELSE elseBody=statement)?    #statIfElse
     | FOR '(' forCtrl=forControl ')' body=statement                         #statFor
     | WHILE condition=parExpression body=statement                          #statWhile
     | DO body=statement WHILE condition=parExpression ';'                   #statDoWhile
@@ -441,17 +441,13 @@ switchLabel
     ;
 
 forControl
-    : enhancedForControl
-    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList?
+    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression #forCtrlEnhanced
+    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList? #forCtrlStandard
     ;
 
 forInit
     : localVariableDeclaration
     | expressionList
-    ;
-
-enhancedForControl
-    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression
     ;
 
 // EXPRESSIONS
@@ -497,7 +493,7 @@ expression
     | expression '[' accessAddr=expression ']'                      #exprArrayAccess
     | methodCall                                                    #exprMethodCall
     | NEW creator                                                   #exprNewExpression
-    | '(' annotation* typeType ')' subexpr=expression               #exprTypeCast
+    | '(' annotation* cast=typeType ')' subexpr=expression          #exprTypeCast
     | subexpr=expression postfix=('++' | '--')                      #exprPostfix
     | prefix=('+'|'-'|'++'|'--') subexpr=expression                 #exprPrefix
     | prefix=('~'|'!') subexpr=expression                           #exprPrefix

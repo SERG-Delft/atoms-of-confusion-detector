@@ -6,6 +6,8 @@ import kotlin.test.assertTrue
 
 internal class CliTest {
 
+    // CLI tests:
+
     @BeforeEach
     fun setup() {
         Settings.VERBOSE = false

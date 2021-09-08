@@ -487,15 +487,53 @@ public interface JavaParserListener extends ParseTreeListener {
 	 */
 	void exitLiteral(JavaParser.LiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link JavaParser#integerLiteral}.
+	 * Enter a parse tree produced by the {@code intLitDecimal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
 	 * @param ctx the parse tree
 	 */
-	void enterIntegerLiteral(JavaParser.IntegerLiteralContext ctx);
+	void enterIntLitDecimal(JavaParser.IntLitDecimalContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link JavaParser#integerLiteral}.
+	 * Exit a parse tree produced by the {@code intLitDecimal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
 	 * @param ctx the parse tree
 	 */
-	void exitIntegerLiteral(JavaParser.IntegerLiteralContext ctx);
+	void exitIntLitDecimal(JavaParser.IntLitDecimalContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code intLitHex}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntLitHex(JavaParser.IntLitHexContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code intLitHex}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntLitHex(JavaParser.IntLitHexContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code intLitOctal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntLitOctal(JavaParser.IntLitOctalContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code intLitOctal}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntLitOctal(JavaParser.IntLitOctalContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code intLitBin}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntLitBin(JavaParser.IntLitBinContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code intLitBin}
+	 * labeled alternative in {@link JavaParser#integerLiteral}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntLitBin(JavaParser.IntLitBinContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JavaParser#floatLiteral}.
 	 * @param ctx the parse tree
@@ -971,15 +1009,29 @@ public interface JavaParserListener extends ParseTreeListener {
 	 */
 	void exitSwitchLabel(JavaParser.SwitchLabelContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link JavaParser#forControl}.
+	 * Enter a parse tree produced by the {@code forCtrlEnhanced}
+	 * labeled alternative in {@link JavaParser#forControl}.
 	 * @param ctx the parse tree
 	 */
-	void enterForControl(JavaParser.ForControlContext ctx);
+	void enterForCtrlEnhanced(JavaParser.ForCtrlEnhancedContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link JavaParser#forControl}.
+	 * Exit a parse tree produced by the {@code forCtrlEnhanced}
+	 * labeled alternative in {@link JavaParser#forControl}.
 	 * @param ctx the parse tree
 	 */
-	void exitForControl(JavaParser.ForControlContext ctx);
+	void exitForCtrlEnhanced(JavaParser.ForCtrlEnhancedContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code forCtrlStandard}
+	 * labeled alternative in {@link JavaParser#forControl}.
+	 * @param ctx the parse tree
+	 */
+	void enterForCtrlStandard(JavaParser.ForCtrlStandardContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code forCtrlStandard}
+	 * labeled alternative in {@link JavaParser#forControl}.
+	 * @param ctx the parse tree
+	 */
+	void exitForCtrlStandard(JavaParser.ForCtrlStandardContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JavaParser#forInit}.
 	 * @param ctx the parse tree
@@ -990,16 +1042,6 @@ public interface JavaParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitForInit(JavaParser.ForInitContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JavaParser#enhancedForControl}.
-	 * @param ctx the parse tree
-	 */
-	void enterEnhancedForControl(JavaParser.EnhancedForControlContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JavaParser#enhancedForControl}.
-	 * @param ctx the parse tree
-	 */
-	void exitEnhancedForControl(JavaParser.EnhancedForControlContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JavaParser#parExpression}.
 	 * @param ctx the parse tree
