@@ -23,4 +23,5 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.ExprAssignmentContext) {}
     open fun detect(ctx: JavaParser.LocalVariableDeclarationContext) {}
     open fun detect(ctx: JavaParser.VariableDeclaratorContext) {}
+    open fun detect(ctx: JavaParser.ForCtrlStandardContext) {}
 }

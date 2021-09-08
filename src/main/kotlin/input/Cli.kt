@@ -24,6 +24,7 @@ import parsing.detectors.OmittedCurlyBracesDetector
 import parsing.detectors.PostIncrementDecrementDetector
 import parsing.detectors.PreIncrementDecrementDetector
 import parsing.detectors.RemoveIndentationDetector
+import parsing.detectors.RepurposedVariablesDetector
 import parsing.detectors.TypeConversionDetector
 import java.io.File
 import java.nio.file.Path
@@ -72,7 +73,7 @@ abstract class AtomsCommand(help: String) : CliktCommand(help = help) {
         if (Settings.enabledAtoms["CONDITIONAL_OPERATOR"] == true) listener.registerDetector(ConditionalOperatorDetector(listener, confusionGraph))
         // ARITHMETIC_AS_LOGIC (skipped)
         if (Settings.enabledAtoms["LOGIC_AS_CONTROL_FLOW"] == true) listener.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph))
-        // if (Settings.enabledAtoms["REPURPOSED_VARIABLES"] == true) (pending)
+        if (Settings.enabledAtoms["REPURPOSED_VARIABLES"] == true) listener.registerDetector(RepurposedVariablesDetector(listener, confusionGraph))
         // DEAD_UNREACHABLE_REPEATED (skipped)
         if (Settings.enabledAtoms["CHANGE_OF_LITERAL_ENCODING"] == true) listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
         if (Settings.enabledAtoms["OMITTED_CURLY_BRACES"] == true) listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))

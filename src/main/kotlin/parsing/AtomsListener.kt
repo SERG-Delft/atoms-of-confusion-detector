@@ -222,6 +222,10 @@ class AtomsListener : JavaParserBaseListener() {
         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
     }
 
+    override fun enterForCtrlStandard(ctx: JavaParser.ForCtrlStandardContext) {
+        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+    }
+
     override fun exitBlock(ctx: JavaParser.BlockContext) {
         popScope()
     }
