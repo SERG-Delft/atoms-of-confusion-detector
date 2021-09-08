@@ -1,9 +1,11 @@
+@file:Suppress("MaximumLineLength")
 package input
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import github.GithubUtil
@@ -30,11 +32,24 @@ import java.nio.file.Path
  * Main CLI class
  */
 class Tool : CliktCommand(help = "Analyze Java source code for the presence of atoms of confusion") {
+
+    // the atoms to be disabled
+    private val disabledAtoms: List<String> by option(
+        "-d", "--disabled", help = "Space separated list of disabled atoms"
+    ).multiple()
+
     override fun run() {
-        // do nothing
+
+        // disable provided atoms
+        disabledAtoms.forEach {
+            Settings.enabledAtoms[it] = false
+        }
     }
 }
 
+/**
+ * A base class for subcommands, provides functionality shared between them
+ */
 abstract class AtomsCommand(help: String) : CliktCommand(help = help) {
 
     /**
@@ -43,22 +58,26 @@ abstract class AtomsCommand(help: String) : CliktCommand(help = help) {
      * @param confusionGraph the confusionGraph to write to
      * @return the listener
      */
+    @Suppress("ComplexMethod", "MaxLineLength")
     fun setUpListener(confusionGraph: ConfusionGraph): AtomsListener {
 
         val listener = AtomsListener()
 
         // register all detectors
-        listener.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph))
-        listener.registerDetector(InfixPrecedenceDetector(listener, confusionGraph))
-        listener.registerDetector(ConditionalOperatorDetector(listener, confusionGraph))
-        listener.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph))
-        listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
-        listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
-        listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
-        listener.registerDetector(RemoveIndentationDetector(listener, confusionGraph))
-        listener.registerDetector(IndentationDetector(listener, confusionGraph))
-        listener.registerDetector(TypeConversionDetector(listener, confusionGraph))
-        listener.registerDetector(ConstantVariableDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["INFIX_OPERATOR_PRECEDENCE"] == true) listener.registerDetector(InfixPrecedenceDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["POST_INCREMENT_DECREMENT"] == true) listener.registerDetector(PostIncrementDecrementDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["PRE_INCREMENT_DECREMENT"] == true) listener.registerDetector(PreIncrementDecrementDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["CONSTANT_VARIABLES"] == true) listener.registerDetector(ConstantVariableDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["REMOVE_INDENTATION"] == true) listener.registerDetector(RemoveIndentationDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["CONDITIONAL_OPERATOR"] == true) listener.registerDetector(ConditionalOperatorDetector(listener, confusionGraph))
+        // ARITHMETIC_AS_LOGIC (skipped)
+        if (Settings.enabledAtoms["LOGIC_AS_CONTROL_FLOW"] == true) listener.registerDetector(LogicAsControlFlowDetector(listener, confusionGraph))
+        // if (Settings.enabledAtoms["REPURPOSED_VARIABLES"] == true) (pending)
+        // DEAD_UNREACHABLE_REPEATED (skipped)
+        if (Settings.enabledAtoms["CHANGE_OF_LITERAL_ENCODING"] == true) listener.registerDetector(ChangeOfLiteralEncodingDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["OMITTED_CURLY_BRACES"] == true) listener.registerDetector(OmittedCurlyBracesDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["TYPE_CONVERSION"] == true) listener.registerDetector(TypeConversionDetector(listener, confusionGraph))
+        if (Settings.enabledAtoms["INDENTATION"] == true) listener.registerDetector(IndentationDetector(listener, confusionGraph))
 
         return listener
     }

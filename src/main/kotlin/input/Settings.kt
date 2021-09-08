@@ -17,4 +17,20 @@ object Settings {
     var OUTPUT = "atoms-of-confusion-analysis"
     // controls if the tool logs errors
     var LOG = false
+
+    val enabledAtoms = mutableMapOf(
+        "INFIX_OPERATOR_PRECEDENCE" to true,
+        "PRE_INCREMENT_DECREMENT" to true,
+        "CONSTANT_VARIABLES" to true,
+        "REMOVE_INDENTATION" to true,
+        "CONDITIONAL_OPERATOR" to true,
+        "ARITHMETIC_AS_LOGIC" to true,
+        "LOGIC_AS_CONTROL_FLOW" to true,
+        "REPURPOSED_VARIABLES" to true,
+        "DEAD_UNREACHABLE_REPEATED" to true,
+        "CHANGE_OF_LITERAL_ENCODING" to true,
+        "OMITTED_CURLY_BRACES" to true,
+        "TYPE_CONVERSION" to true,
+        "INDENTATION" to true
+    )
 }
