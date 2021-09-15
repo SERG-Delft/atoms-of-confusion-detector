@@ -52,27 +52,27 @@ sealed class GithubUtil {
             val source = parseBranchDescriptor(sourceTxt, repo)
             val target = parseBranchDescriptor(targetTxt, repo)
 
-            // download patch file
-            val patchFile = try {
-                downloadPatchFile(url)
+            // download diff file
+            val diffFile = try {
+                downloadDiffFile(url)
             } catch (e: NonexistentPRException) {
                 throw e
             }
 
-            return PullRequestData(source, target, repo, patchFile)
+            return PullRequestData(source, target, repo, diffFile)
         }
 
         /**
-         * Download the patch file for a pull request
+         * Download the diff file for a pull request
          *
          * @param url the PR url
-         * @return the patch file text for the pr
+         * @return the diff file text for the pr
          */
         @Throws(NonexistentPRException::class)
-        fun downloadPatchFile(url: String): String {
+        fun downloadDiffFile(url: String): String {
 
-            // download patch file
-            val (_, response, result) = "$url.patch".httpGet().responseString()
+            // download diff file
+            val (_, response, result) = "$url.diff".httpGet().responseString()
 
             if (response.isSuccessful) {
                 return result.component1()!!
@@ -138,14 +138,14 @@ sealed class GithubUtil {
         }
 
         /**
-         * Get a list of all changed .java files in a patch
+         * Get a list of all changed .java files in a diff
          *
-         * @param patch the patch file contents
-         * @return the file paths of the .java files affected in the patch
+         * @param diff the diff file contents
+         * @return the file paths of the .java files affected in the diff
          */
         @Suppress("MagicNumber")
-        fun getChangedJavaFiles(patch: String): List<String> = patch.split("\n")
-            .filter { it.length >= 3 && it.slice(0 until 3) == "+++" } // get lines starting with +++
+        fun getChangedJavaFiles(diff: String): List<String> = diff.split("\n")
+            .filter { it.startsWith("+++") } // get lines starting with +++
             .map { it.split(" ")[1] } // get the path, following the plus signs
             .map { it.slice(2 until it.length) } // remove the b/ from each path
             .filter { it.matches(Regex(".*\\.java")) }

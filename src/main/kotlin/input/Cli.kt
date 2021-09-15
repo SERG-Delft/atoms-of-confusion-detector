@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import github.DiffParser
 import github.GithubUtil
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import output.graph.ConfusionGraph
@@ -173,6 +174,7 @@ class FilesCommand : AtomsCommand("Analyze the provided files for atoms of confu
 /**
  * CLI for the pull request subcommand
  */
+@Suppress("NestedBlockDepth")
 class PRCommand : AtomsCommand("Analyze the provided github pull request for atoms of confusion") {
 
     private val verboseFlag by option(
@@ -197,7 +199,7 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         val pr = GithubUtil.getPullRequestInfo(url)
 
         // get changed files
-        val javaFiles = GithubUtil.getChangedJavaFiles(pr.patch)
+        val javaFiles = GithubUtil.getChangedJavaFiles(pr.diff)
 
         // get the source and target files
         val sourceFiles = mutableListOf<ParsedFile>()
@@ -225,6 +227,7 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
             if (downloadedFile != null) targetFiles.add(downloadedFile)
         }
 
+        // run detector on source files
         val sourceGraph = ConfusionGraph(sourceFiles.map { it.name })
         val sourceListener = setUpListener(sourceGraph)
 
@@ -232,11 +235,43 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         runListener(sourceFiles, sourceListener, "sourceLog.txt")
         CsvWriter.outputData(sourceGraph, "sourceResults.csv")
 
+        // run detector on target files
         val targetGraph = ConfusionGraph(sourceFiles.map { it.name })
         val targetListener = setUpListener(sourceGraph)
 
         println("analyzing target files...(${targetFiles.size})")
         runListener(targetFiles, targetListener, "targetLog.txt")
         CsvWriter.outputData(targetGraph, "targetResults.csv")
+
+        // read the diff file
+        val parsedDiff = DiffParser(pr.diff)
+
+        val addedAtoms = mutableListOf<Triple<String, String, Int>>()
+        val removedAtoms = mutableListOf<Triple<String, String, Int>>()
+
+        // TODO extract to class and test
+        // get added atoms
+        for (file in targetFiles) {
+            for (atom in targetGraph.findAtomsInSource(file.name)) {
+                for (line in atom.lines) {
+                    if (parsedDiff.getAddedLinesForFile(file.name).contains(line)) {
+                        addedAtoms.add(Triple(atom.nameOfAtom, atom.nameOfSource, line))
+                    }
+                }
+            }
+        }
+
+        // get removed atoms
+        for (file in sourceFiles) {
+            for (atom in sourceGraph.findAtomsInSource(file.name)) {
+                for (line in atom.lines) {
+                    if (parsedDiff.getAddedLinesForFile(file.name).contains(line)) {
+                        removedAtoms.add(Triple(atom.nameOfAtom, atom.nameOfSource, line))
+                    }
+                }
+            }
+        }
+
+        println(removedAtoms)
     }
 }
