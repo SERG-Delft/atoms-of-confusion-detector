@@ -6,7 +6,7 @@ import java.lang.NullPointerException
 import kotlin.math.absoluteValue
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "MagicNumber")
-class DiffParser(val diff: String) {
+class DiffParser(diff: String) {
 
     private val addedLinesPerFile = mutableMapOf<String, MutableSet<Int>>()
     private val removedLinesPerFile = mutableMapOf<String, MutableSet<Int>>()
@@ -80,13 +80,13 @@ class DiffParser(val diff: String) {
         }
     }
 
-    fun getAddedLinesForFile(file: String): MutableSet<Int> {
+    fun addedLinesForFile(file: String): MutableSet<Int> {
         val addedLines = addedLinesPerFile[file]
         addedLines ?: return mutableSetOf()
         return addedLines
     }
 
-    fun getRemovedLinesForFile(file: String): MutableSet<Int> {
+    fun removedLinesForFile(file: String): MutableSet<Int> {
         val removedLines = removedLinesPerFile[file]
         removedLines ?: return mutableSetOf()
         return removedLines

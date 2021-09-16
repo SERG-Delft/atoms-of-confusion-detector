@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import github.DiffParser
 import github.GithubUtil
+import github.PRDelta
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import output.graph.ConfusionGraph
 import output.writers.CsvWriter
@@ -236,8 +237,8 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         CsvWriter.outputData(sourceGraph, "sourceResults.csv")
 
         // run detector on target files
-        val targetGraph = ConfusionGraph(sourceFiles.map { it.name })
-        val targetListener = setUpListener(sourceGraph)
+        val targetGraph = ConfusionGraph(targetFiles.map { it.name })
+        val targetListener = setUpListener(targetGraph)
 
         println("analyzing target files...(${targetFiles.size})")
         runListener(targetFiles, targetListener, "targetLog.txt")
@@ -246,32 +247,7 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         // read the diff file
         val parsedDiff = DiffParser(pr.diff)
 
-        val addedAtoms = mutableListOf<Triple<String, String, Int>>()
-        val removedAtoms = mutableListOf<Triple<String, String, Int>>()
-
-        // TODO extract to class and test
-        // get added atoms
-        for (file in targetFiles) {
-            for (atom in targetGraph.findAtomsInSource(file.name)) {
-                for (line in atom.lines) {
-                    if (parsedDiff.getAddedLinesForFile(file.name).contains(line)) {
-                        addedAtoms.add(Triple(atom.nameOfAtom, atom.nameOfSource, line))
-                    }
-                }
-            }
-        }
-
-        // get removed atoms
-        for (file in sourceFiles) {
-            for (atom in sourceGraph.findAtomsInSource(file.name)) {
-                for (line in atom.lines) {
-                    if (parsedDiff.getAddedLinesForFile(file.name).contains(line)) {
-                        removedAtoms.add(Triple(atom.nameOfAtom, atom.nameOfSource, line))
-                    }
-                }
-            }
-        }
-
-        println(removedAtoms)
+        val delta = PRDelta(sourceGraph, targetGraph, sourceFiles, targetFiles, parsedDiff)
+        CsvWriter.outputData(delta, "${pr.repo.user}-${pr.repo.name}-${pr.number}")
     }
 }

@@ -28,7 +28,7 @@ sealed class GithubUtil {
          */
         fun getPullRequestInfo(url: String): PullRequestData {
 
-            val (userName, repoName) = parseUrl(url)
+            val (userName, repoName, number) = parseUrl(url)
             val repo = GhRepo(userName, repoName)
 
             // download the html of the pr site to get the source and target branch descriptors
@@ -59,7 +59,7 @@ sealed class GithubUtil {
                 throw e
             }
 
-            return PullRequestData(source, target, repo, diffFile)
+            return PullRequestData(source, target, repo, number, diffFile)
         }
 
         /**
@@ -120,7 +120,7 @@ sealed class GithubUtil {
          * @return the user and reponame in the url
          */
         @Throws(InvalidPrUrlException::class)
-        fun parseUrl(url: String): Pair<String, String> {
+        fun parseUrl(url: String): Triple<String, String, Int> {
 
             // parse the url path
             val path = URI(url).path.split("/")
@@ -133,8 +133,9 @@ sealed class GithubUtil {
 
             val repoName = path[2]
             val userName = path[1]
+            val number = path[4].toInt()
 
-            return Pair(userName, repoName)
+            return Triple(userName, repoName, number)
         }
 
         /**
