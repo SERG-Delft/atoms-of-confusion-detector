@@ -27,6 +27,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+Adaptations were made to the original grammar to better suit the atoms of confusion detection.
+**/
+
 parser grammar JavaParser;
 
 options { tokenVocab=JavaLexer; }
