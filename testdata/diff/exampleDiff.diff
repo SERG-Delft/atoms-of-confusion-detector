@@ -1,0 +1,144 @@
+diff --git a/atoms-of-confusion-analysis.csv b/atoms-of-confusion-analysis.csv
+index 862e2d2..e039621 100644
+--- a/atoms-of-confusion-analysis.csv
++++ b/atoms-of-confusion-analysis.csv
+@@ -1,5 +1,5 @@
+-INFIX_OPERATOR_PRECEDENCE,testdata\myClass.java,[8]
+-POST_INCREMENT_DECREMENT,testdata\myClass.java,"[5, 8]"
+-PRE_INCREMENT_DECREMENT,testdata\myClass.java,[4]
+-CONDITIONAL_OPERATOR,testdata\myClass.java,[11]
+-LOGIC_AS_CONTROL_FLOW,testdata\myClass.java,[8]
++INFIX_OPERATOR_PRECEDENCE,testdata/myClass.java,[8]
++POST_INCREMENT_DECREMENT,testdata/myClass.java,"[5, 8]"
++PRE_INCREMENT_DECREMENT,testdata/myClass.java,[4]
++CONDITIONAL_OPERATOR,testdata/myClass.java,[11]
++LOGIC_AS_CONTROL_FLOW,testdata/myClass.java,[8]
+diff --git a/src/main/java/JavaParser.g4 b/src/main/java/JavaParser.g4
+index 0dd7ef4..cb544db 100644
+--- a/src/main/java/JavaParser.g4
++++ b/src/main/java/JavaParser.g4
+@@ -497,7 +497,7 @@ expression
+     | expression '[' accessAddr=expression ']'                      #exprArrayAccess
+     | methodCall                                                    #exprMethodCall
+     | NEW creator                                                   #exprNewExpression
+-    | '(' annotation* typeType ')' subexpr=expression               #exprTypeCast
++    | '(' annotation* cast=typeType ')' subexpr=expression          #exprTypeCast
+     | subexpr=expression postfix=('++' | '--')                      #exprPostfix
+     | prefix=('+'|'-'|'++'|'--') subexpr=expression                 #exprPrefix
+     | prefix=('~'|'!') subexpr=expression                           #exprPrefix
+diff --git a/src/main/java/JavaParser.java b/src/main/java/JavaParser.java
+index f550115..c9fd22f 100644
+--- a/src/main/java/JavaParser.java
++++ b/src/main/java/JavaParser.java
+@@ -7643,12 +7643,13 @@ public void exitRule(ParseTreeListener listener) {
+ 		}
+ 	}
+ 	public static class ExprTypeCastContext extends ExpressionContext {
++		public TypeTypeContext cast;
+ 		public ExpressionContext subexpr;
+ 		public TerminalNode LPAREN() { return getToken(JavaParser.LPAREN, 0); }
++		public TerminalNode RPAREN() { return getToken(JavaParser.RPAREN, 0); }
+ 		public TypeTypeContext typeType() {
+ 			return getRuleContext(TypeTypeContext.class,0);
+ 		}
+-		public TerminalNode RPAREN() { return getToken(JavaParser.RPAREN, 0); }
+ 		public ExpressionContext expression() {
+ 			return getRuleContext(ExpressionContext.class,0);
+ 		}
+@@ -8267,7 +8268,7 @@ private ExpressionContext expression(int _p) throws RecognitionException {
+ 					_alt = getInterpreter().adaptivePredict(_input,135,_ctx);
+ 				}
+ 				setState(1124);
+-				typeType();
++				((ExprTypeCastContext)_localctx).cast = typeType();
+ 				setState(1125);
+ 				match(RPAREN);
+ 				setState(1126);
+diff --git a/src/main/kotlin/parsing/AtomsListener.kt b/src/main/kotlin/parsing/AtomsListener.kt
+index 6cbb92f..ced5a37 100644
+--- a/src/main/kotlin/parsing/AtomsListener.kt
++++ b/src/main/kotlin/parsing/AtomsListener.kt
+@@ -46,4 +46,8 @@ class AtomsListener : JavaParserBaseListener() {
+     override fun enterExprTernary(ctx: JavaParser.ExprTernaryContext) {
+         callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
+     }
++
++    override fun enterExprTypeCast(ctx: JavaParser.ExprTypeCastContext) {
++        callbacksMap[ctx::class]?.forEach { it.detect(ctx) }
++    }
+ }
+diff --git a/src/main/kotlin/parsing/detectors/Detector.kt b/src/main/kotlin/parsing/detectors/Detector.kt
+index d4a324a..1e04ac8 100644
+--- a/src/main/kotlin/parsing/detectors/Detector.kt
++++ b/src/main/kotlin/parsing/detectors/Detector.kt
+@@ -10,4 +10,5 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
+     open fun detect(ctx: JavaParser.ExprInstanceofContext) {}
+     open fun detect(ctx: JavaParser.ExprInfixBitshiftContext) {}
+     open fun detect(ctx: JavaParser.ExprTernaryContext) {}
++    open fun detect(ctx: JavaParser.ExprTypeCastContext) {}
+ }
+diff --git a/src/main/kotlin/parsing/detectors/TypeConversionDetector.kt b/src/main/kotlin/parsing/detectors/TypeConversionDetector.kt
+new file mode 100644
+index 0000000..7e3ef78
+--- /dev/null
++++ b/src/main/kotlin/parsing/detectors/TypeConversionDetector.kt
+@@ -0,0 +1,20 @@
++package parsing.detectors
++
++import output.Atom
++import output.graph.ConfusionGraph
++import parsing.AtomsListener
++
++@Visit(JavaParser.ExprTypeCastContext::class)
++class TypeConversionDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
++
++    private val dangerousCasts = hashSetOf("byte", "int", "short", "long", "Byte", "Integer", "Short", "Long")
++
++    override fun detect(ctx: JavaParser.ExprTypeCastContext) {
++
++        val castedType = ctx.cast.text
++
++        if (dangerousCasts.contains(castedType)) {
++            graph.addAppearancesOfAtom(Atom.TYPE_CONVERSION, listener.fileName, mutableSetOf(ctx.start.line))
++        }
++    }
++}
+diff --git a/src/test/kotlin/parsing/detectors/TypeConversionDetectorTest.kt b/src/test/kotlin/parsing/detectors/TypeConversionDetectorTest.kt
+new file mode 100644
+index 0000000..cbb1d62
+--- /dev/null
++++ b/src/test/kotlin/parsing/detectors/TypeConversionDetectorTest.kt
+@@ -0,0 +1,33 @@
++package parsing.detectors
++
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import kotlin.test.assertTrue
++
++internal class TypeConversionDetectorTest : DetectorTest() {
++
++    private fun assertPresent(atoms: List<List<Any>>) {
++        assertAtom(atoms, "TYPE_CONVERSION")
++    }
++
++    private fun assertAbsent(atoms: List<List<Any>>) {
++        assertTrue(atoms.isEmpty())
++    }
++
++    @BeforeEach
++    fun setup() {
++        this.detector = TypeConversionDetector(this.listener, this.graph)
++    }
++
++    @Test
++    fun testPresent() {
++        val atoms = runVisitorExpr("(int) 1.9")
++        assertPresent(atoms)
++    }
++
++    @Test
++    fun testAbsent() {
++        val atoms = runVisitorExpr("(double) 1.9")
++        assertAbsent(atoms)
++    }
++}
