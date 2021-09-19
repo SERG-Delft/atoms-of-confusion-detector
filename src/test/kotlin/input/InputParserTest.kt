@@ -21,7 +21,7 @@ class InputParserTest {
         inputResolver.resolveFile(myClass)
 
         val expected = listOf("testdata/myClass.java")
-        val actual = inputResolver.files.map { it.name }
+        val actual = inputResolver.files.map { it.name.replace("\\", "/") }
         assertEquals(expected, actual)
     }
 
@@ -32,7 +32,7 @@ class InputParserTest {
         inputResolver.resolveFile(parentDir)
 
         val actual = listOf("testdata/subdir/nestedClass.java")
-        val expected = inputResolver.files.map { it.name }
+        val expected = inputResolver.files.map { it.name.replace("\\", "/") }
         assertEquals(expected, actual)
     }
 }

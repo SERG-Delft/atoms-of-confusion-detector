@@ -16,7 +16,7 @@ internal class CliTest {
 
     @Test
     fun testVerboseFlagGiven() {
-        main(arrayOf("files", "-v", "testdata/myClass.java"))
+        main(arrayOf("-v", "files", "testdata/myClass.java"))
         assertTrue { Settings.VERBOSE }
     }
 
@@ -28,7 +28,7 @@ internal class CliTest {
 
     @Test
     fun testVerboseAndRecursiveSettingsGiven() {
-        main(arrayOf("files", "-r", "-v", "testdata/myClass.java"))
+        main(arrayOf("-v", "files", "-r", "testdata/myClass.java"))
         assertTrue { Settings.RECURSIVELY_SEARCH_DIRECTORIES }
         assertTrue { Settings.VERBOSE }
     }
@@ -42,13 +42,13 @@ internal class CliTest {
 
     @Test
     fun testVerboseExplicitName() {
-        main(arrayOf("files", "testdata/myClass.java", "--verbose"))
+        main(arrayOf("--verbose", "files", "testdata/myClass.java"))
         assertTrue { Settings.VERBOSE }
     }
 
     @Test
     fun testVerboseCapitalName() {
-        main(arrayOf("files", "testdata/myClass.java", "-V"))
+        main(arrayOf("-V", "files", "testdata/myClass.java"))
         assertTrue { Settings.VERBOSE }
     }
 

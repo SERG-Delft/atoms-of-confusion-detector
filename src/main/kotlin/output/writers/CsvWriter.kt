@@ -1,6 +1,7 @@
 package output.writers
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import github.PRDelta
 import input.Settings
 import output.graph.ConfusionGraph
 
@@ -25,5 +26,22 @@ object CsvWriter {
     fun outputData(graph: ConfusionGraph, filename: String) {
         val rows = graph.getAllAtomAppearances()
         csvWriter().writeAll(rows, filename)
+    }
+
+    /**
+     * Outputs the PR delta to csv files.
+     *
+     * @param delta the PRDelta
+     * @param prName the name of the pull request
+     */
+    fun outputData(
+        delta: PRDelta,
+        prName: String,
+        resultsDir: String
+    ) {
+
+        csvWriter().writeAll(delta.getAddedAtoms(), "$resultsDir/addedAtoms-$prName.csv")
+        csvWriter().writeAll(delta.getRemovedAtoms(), "$resultsDir/removedAtoms-$prName.csv")
+        csvWriter().writeAll(delta.getRemainingAtoms(), "$resultsDir/remainingAtoms-$prName.csv")
     }
 }

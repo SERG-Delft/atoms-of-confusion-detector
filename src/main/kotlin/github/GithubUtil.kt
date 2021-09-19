@@ -2,16 +2,14 @@ package github
 
 import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.httpGet
-import github.exceptions.InvalidPrHtmlException
 import github.exceptions.InvalidPrUrlException
 import github.exceptions.NonexistentPRException
+import github.exceptions.UsageLimitException
+import input.Settings
 import org.antlr.v4.runtime.CharStreams
-import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.json.simple.JSONObject
+import org.json.simple.parser.JSONParser
 import parsing.ParsedFile
-import java.net.MalformedURLException
-import java.net.SocketTimeoutException
 import java.net.URI
 
 // for now its like this until a proper error handling system is in place
@@ -26,53 +24,49 @@ sealed class GithubUtil {
          * @param url the pr url
          * @return an instance of PullRequestData
          */
-        fun getPullRequestInfo(url: String): PullRequestData {
+        fun getPullRequestInfo(url: String): GhPullRequestData {
 
-            val (userName, repoName) = parseUrl(url)
+            val (userName, repoName, number) = parseUrl(url)
             val repo = GhRepo(userName, repoName)
 
-            // download the html of the pr site to get the source and target branch descriptors
-            val doc = try {
-                Jsoup.connect(url).get()
-            } catch (e: MalformedURLException) {
-                throw e
-            } catch (e: HttpStatusException) {
-                throw e
-            } catch (e: SocketTimeoutException) {
-                throw e
-            }
+            // create request
+            val request = "http://api.github.com/repos/${repo.user}/${repo.name}/pulls/$number".httpGet()
 
-            // get the source and target repos from the html
-            val (sourceTxt, targetTxt) = try {
-                extractBranchDescriptors(doc)
-            } catch (e: InvalidPrHtmlException) {
-                throw e
-            }
+            // add auth header if provided
+            if (Settings.TOKEN != null) request.appendHeader("authorization" to "token ${Settings.TOKEN}")
 
-            val source = parseBranchDescriptor(sourceTxt, repo)
-            val target = parseBranchDescriptor(targetTxt, repo)
+            // send request
+            val (_, response, result) = request.responseString()
 
-            // download patch file
-            val patchFile = try {
-                downloadPatchFile(url)
+            if (response.statusCode == 403) throw UsageLimitException()
+            if (!response.isSuccessful) throw NonexistentPRException(url)
+
+            val json = JSONParser().parse(result.component1()) as JSONObject
+
+            val toCommit = createCommitDescriptor(json["head"] as JSONObject, repo)
+            val fromCommit = createCommitDescriptor(json["base"] as JSONObject, repo)
+
+            // download diff file
+            val diffFile = try {
+                downloadDiffFile(url)
             } catch (e: NonexistentPRException) {
                 throw e
             }
 
-            return PullRequestData(source, target, repo, patchFile)
+            return GhPullRequestData(toCommit, fromCommit, repo, number, diffFile)
         }
 
         /**
-         * Download the patch file for a pull request
+         * Download the diff file for a pull request
          *
          * @param url the PR url
-         * @return the patch file text for the pr
+         * @return the diff file text for the pr
          */
         @Throws(NonexistentPRException::class)
-        fun downloadPatchFile(url: String): String {
+        fun downloadDiffFile(url: String): String {
 
-            // download patch file
-            val (_, response, result) = "$url.patch".httpGet().responseString()
+            // download diff file
+            val (_, response, result) = "$url.diff".httpGet().responseString()
 
             if (response.isSuccessful) {
                 return result.component1()!!
@@ -80,36 +74,24 @@ sealed class GithubUtil {
         }
 
         /**
-         * Read a JSoup document for a github PR and extract the source and target descriptors
+         * Create a github commit descriptor from the json of head/base
          *
-         * @param doc the JSoup document for the pr site
-         * @return the source and target branch descriptors
-         */
-        @Throws(InvalidPrHtmlException::class)
-        fun extractBranchDescriptors(doc: Document): Pair<String, String> {
-            val elements = doc.select(".commit-ref")
-            if (elements.size <= 1) throw InvalidPrHtmlException()
-            val target = elements[0].text()
-            val source = elements[1].text()
-            return Pair(source, target)
-        }
-
-        /**
-         * Parse a github branch descriptor, this is what is displayed
-         * at the top of a PR and is of the format "branch", or "repo:branch"
-         *
-         * @param branchDescriptor the branch descriptor
+         * @param json the json object, head or base
          * @param repo the name of the repository this PR belongs to
          * @return a pair containing the target repo and target branch
          */
-        fun parseBranchDescriptor(branchDescriptor: String, repo: GhRepo): GhBranchDescriptor {
-            return if (branchDescriptor.contains(":")) {
+        private fun createCommitDescriptor(json: JSONObject, repo: GhRepo): GhCommitData {
+
+            val label = json["label"].toString()
+            val sha = json["sha"].toString()
+
+            return if (label.contains(":")) {
                 // if the ":" is present the parent repo is different
-                val split = branchDescriptor.split(":")
-                GhBranchDescriptor(GhRepo(split[0], repo.name), split[1])
+                val split = label.split(":")
+                GhCommitData(GhRepo(split[0], repo.name), sha)
             } else {
                 // if the ":" is not present the parent repo is the one that the PR belongs to
-                GhBranchDescriptor(repo, branchDescriptor)
+                GhCommitData(repo, sha)
             }
         }
 
@@ -117,10 +99,10 @@ sealed class GithubUtil {
          * Check if the PR url meets the expected format
          *
          * @param url the PR url
-         * @return the user and reponame in the url
+         * @return the user, repo name and pr number for the pr url
          */
         @Throws(InvalidPrUrlException::class)
-        fun parseUrl(url: String): Pair<String, String> {
+        fun parseUrl(url: String): Triple<String, String, Int> {
 
             // parse the url path
             val path = URI(url).path.split("/")
@@ -133,40 +115,26 @@ sealed class GithubUtil {
 
             val repoName = path[2]
             val userName = path[1]
+            val number = path[4].toInt()
 
-            return Pair(userName, repoName)
+            return Triple(userName, repoName, number)
         }
-
-        /**
-         * Get a list of all changed .java files in a patch
-         *
-         * @param patch the patch file contents
-         * @return the file paths of the .java files affected in the patch
-         */
-        @Suppress("MagicNumber")
-        fun getChangedJavaFiles(patch: String): List<String> = patch.split("\n")
-            .filter { it.length >= 3 && it.slice(0 until 3) == "+++" } // get lines starting with +++
-            .map { it.split(" ")[1] } // get the path, following the plus signs
-            .map { it.slice(2 until it.length) } // remove the b/ from each path
-            .filter { it.matches(Regex(".*\\.java")) }
 
         /**
          * Download a file from github
          *
-         * @param user
-         * @param repo
-         * @param branch
-         * @param filePath
-         * @return a GitFile for the specified file, null if not found
+         * @param commit the commit descriptor
+         * @param filepath the file path
+         * @return a ParsedFile for the specified file, null if not found
          */
-        fun downloadFile(user: String, repo: String, branch: String, filePath: String): ParsedFile? {
+        fun downloadAndParseFile(commit: GhCommitData, filepath: String): ParsedFile? {
 
-            val url = "http://raw.githubusercontent.com/$user/$repo/$branch/$filePath"
+            val url = "http://raw.githubusercontent.com/${commit.repo.user}/${commit.repo.name}/${commit.sha}/$filepath"
             val (_, response, result) = url.httpGet().responseString()
             return if (response.isSuccessful) {
                 val charStream = CharStreams.fromString(result.component1()!!)
                 val parsedFile = ParsedFile(charStream)
-                parsedFile.name = filePath
+                parsedFile.name = filepath
                 parsedFile
             } else {
                 null

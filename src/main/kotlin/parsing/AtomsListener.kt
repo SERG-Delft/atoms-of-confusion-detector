@@ -45,6 +45,11 @@ class AtomsListener : JavaParserBaseListener() {
 
     private val callbacksMap = mutableMapOf<KClass<*>, MutableList<Detector>>()
 
+    /**
+     * Registers a Detector object to the listener.
+     *
+     * @param detector the Detector to register.
+     */
     fun registerDetector(detector: Detector) {
 
         val annotation = detector::class.findAnnotation<Visit>() ?: return
@@ -238,6 +243,11 @@ class AtomsListener : JavaParserBaseListener() {
         currentScope = currentScope?.enclosingScope
     }
 
+    /**
+     * Sets up a new symbol in the scope.
+     *
+     * @param newSymbol the symbol to add.
+     */
     private fun setupNewSymbol(newSymbol: SymbolWithScope) {
         newSymbol.enclosingScope = currentScope
         currentScope?.define(newSymbol)

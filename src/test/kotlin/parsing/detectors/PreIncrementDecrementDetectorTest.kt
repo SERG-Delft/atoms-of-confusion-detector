@@ -2,6 +2,7 @@ package parsing.detectors
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 internal class PreIncrementDecrementDetectorTest : DetectorTest() {
 
@@ -78,5 +79,19 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
         val code = "class A { public void foo() { for (int i = 0; i < 10; ++i) {} } }"
         val atoms = runVisitorFile(code)
         assertAtom(atoms, "PRE_INCREMENT_DECREMENT_IN_FOR_LOOP")
+    }
+
+    @Test
+    fun testTildeNotDetected() {
+        val code = "class A { int a = 32; public void foo() { ~a } }"
+        val atoms = runVisitorFile(code)
+        assertEquals(0, atoms.size)
+    }
+
+    @Test
+    fun testBangNotDetected() {
+        val code = "class A { int a = 32; public void foo() { !a } }"
+        val atoms = runVisitorFile(code)
+        assertEquals(0, atoms.size)
     }
 }

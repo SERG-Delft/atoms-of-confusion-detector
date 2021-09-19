@@ -17,6 +17,11 @@ object Settings {
     var OUTPUT = "atoms-of-confusion-analysis"
     // controls if the tool logs errors
     var LOG = false
+    // controls if the tool downloads files
+    var DOWNLOAD = false
+
+    // the optional API token
+    var TOKEN: String? = null
 
     val enabledAtoms = mutableMapOf(
         "INFIX_OPERATOR_PRECEDENCE" to true,
