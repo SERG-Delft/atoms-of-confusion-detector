@@ -1,13 +1,12 @@
 package github
 
 import output.graph.ConfusionGraph
-import parsing.ParsedFile
 
 class PRDelta(
-    sourceGraph: ConfusionGraph,
-    targetGraph: ConfusionGraph,
-    sourceFiles: List<ParsedFile>,
-    targetFiles: List<ParsedFile>,
+    toGraph: ConfusionGraph,
+    fromGraph: ConfusionGraph,
+    toFiles: List<String>,
+    fromFiles: List<String>,
     parsedDiff: DiffParser
 ) {
 
@@ -21,27 +20,27 @@ class PRDelta(
 
     init {
 
-        // for each atom in the target, check if it is newly added or remaining from before
-        for (file in targetFiles) {
-            val atomsInFile = targetGraph.findAtomsInSource(file.name)
+        // for each toAtom, check if it is newly added or remaining from before
+        for (file in toFiles) {
+            val atomsInFile = toGraph.findAtomsInSource(file)
             for (atom in atomsInFile) {
                 for (line in atom.lines) {
-                    if (parsedDiff.addedLinesForFile(file.name).contains(line)) {
-                        addAtomInstance(addedAtoms, atom.nameOfAtom, file.name, line)
+                    if (parsedDiff.addedLinesForFile(file).contains(line)) {
+                        addAtomInstance(addedAtoms, atom.nameOfAtom, file, line)
                     } else {
-                        addAtomInstance(remainingAtoms, atom.nameOfAtom, file.name, line)
+                        addAtomInstance(remainingAtoms, atom.nameOfAtom, file, line)
                     }
                 }
             }
         }
 
-        // for each atom in the source, check if it is removed
-        for (file in sourceFiles) {
-            val atomsInFile = sourceGraph.findAtomsInSource(file.name)
+        // for each fromAtom, check if it is removed
+        for (file in fromFiles) {
+            val atomsInFile = fromGraph.findAtomsInSource(file)
             for (atom in atomsInFile) {
                 for (line in atom.lines) {
-                    if (parsedDiff.removedLinesForFile(file.name).contains(line)) {
-                        addAtomInstance(removedAtoms, atom.nameOfAtom, file.name, line)
+                    if (parsedDiff.removedLinesForFile(file).contains(line)) {
+                        addAtomInstance(removedAtoms, atom.nameOfAtom, file, line)
                     }
                 }
             }

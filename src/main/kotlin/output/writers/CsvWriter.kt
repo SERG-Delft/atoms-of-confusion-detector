@@ -36,11 +36,12 @@ object CsvWriter {
      */
     fun outputData(
         delta: PRDelta,
-        prName: String
+        prName: String,
+        resultsDir: String
     ) {
 
-        csvWriter().writeAll(delta.getAddedAtoms(), "addedAtoms-$prName.csv")
-        csvWriter().writeAll(delta.getRemovedAtoms(), "removedAtoms-$prName.csv")
-        csvWriter().writeAll(delta.getRemainingAtoms(), "remainingAtoms-$prName.csv")
+        csvWriter().writeAll(delta.getAddedAtoms(), "$resultsDir/addedAtoms-$prName.csv")
+        csvWriter().writeAll(delta.getRemovedAtoms(), "$resultsDir/removedAtoms-$prName.csv")
+        csvWriter().writeAll(delta.getRemainingAtoms(), "$resultsDir/remainingAtoms-$prName.csv")
     }
 }

@@ -11,6 +11,9 @@ class DiffParser(diff: String) {
     private val addedLinesPerFile = mutableMapOf<String, MutableSet<Int>>()
     private val removedLinesPerFile = mutableMapOf<String, MutableSet<Int>>()
 
+    val fromFileNames = mutableListOf<String>()
+    val toFileNames = mutableListOf<String>()
+
     init {
 
         var currentFromFileName = ""
@@ -31,15 +34,27 @@ class DiffParser(diff: String) {
 
                     line.startsWith("---") -> {
 
+                        // get the file path
+                        val filePath = line.substring(6)
+
+                        // get save the from file
+                        fromFileNames.add(filePath)
+
                         // update the fromFile
-                        currentFromFileName = line.substring(6)
+                        currentFromFileName = filePath
                         removedLinesPerFile[currentFromFileName] = mutableSetOf()
                     }
 
                     line.startsWith("+++") -> {
 
+                        // get the file path
+                        val filePath = line.substring(6)
+
+                        // get save the to file
+                        toFileNames.add(filePath)
+
                         // update the toFile
-                        currentToFileName = line.substring(6)
+                        currentToFileName = filePath
                         addedLinesPerFile[currentToFileName] = mutableSetOf()
                     }
 

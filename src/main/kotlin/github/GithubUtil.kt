@@ -26,7 +26,7 @@ sealed class GithubUtil {
          * @param url the pr url
          * @return an instance of PullRequestData
          */
-        fun getPullRequestInfo(url: String): PullRequestData {
+        fun getPullRequestInfo(url: String): GhPullRequestData {
 
             val (userName, repoName, number) = parseUrl(url)
             val repo = GhRepo(userName, repoName)
@@ -59,7 +59,7 @@ sealed class GithubUtil {
                 throw e
             }
 
-            return PullRequestData(source, target, repo, number, diffFile)
+            return GhPullRequestData(source, target, repo, number, diffFile)
         }
 
         /**
@@ -102,14 +102,14 @@ sealed class GithubUtil {
          * @param repo the name of the repository this PR belongs to
          * @return a pair containing the target repo and target branch
          */
-        fun parseBranchDescriptor(branchDescriptor: String, repo: GhRepo): GhBranchDescriptor {
+        fun parseBranchDescriptor(branchDescriptor: String, repo: GhRepo): GhCommitData {
             return if (branchDescriptor.contains(":")) {
                 // if the ":" is present the parent repo is different
                 val split = branchDescriptor.split(":")
-                GhBranchDescriptor(GhRepo(split[0], repo.name), split[1])
+                GhCommitData(GhRepo(split[0], repo.name), split[1])
             } else {
                 // if the ":" is not present the parent repo is the one that the PR belongs to
-                GhBranchDescriptor(repo, branchDescriptor)
+                GhCommitData(repo, branchDescriptor)
             }
         }
 
@@ -139,35 +139,20 @@ sealed class GithubUtil {
         }
 
         /**
-         * Get a list of all changed .java files in a diff
-         *
-         * @param diff the diff file contents
-         * @return the file paths of the .java files affected in the diff
-         */
-        @Suppress("MagicNumber")
-        fun getChangedJavaFiles(diff: String): List<String> = diff.split("\n")
-            .filter { it.startsWith("+++") } // get lines starting with +++
-            .map { it.split(" ")[1] } // get the path, following the plus signs
-            .map { it.slice(2 until it.length) } // remove the b/ from each path
-            .filter { it.matches(Regex(".*\\.java")) }
-
-        /**
          * Download a file from github
          *
-         * @param user
-         * @param repo
-         * @param branch
-         * @param filePath
-         * @return a GitFile for the specified file, null if not found
+         * @param commit the commit descriptor
+         * @param filepath the file path
+         * @return a ParsedFile for the specified file, null if not found
          */
-        fun downloadFile(user: String, repo: String, branch: String, filePath: String): ParsedFile? {
+        fun downloadFile(commit: GhCommitData, filepath: String): ParsedFile? {
 
-            val url = "http://raw.githubusercontent.com/$user/$repo/$branch/$filePath"
+            val url = "http://raw.githubusercontent.com/${commit.repo.user}/${commit.repo.name}/${commit.sha}/$filepath"
             val (_, response, result) = url.httpGet().responseString()
             return if (response.isSuccessful) {
                 val charStream = CharStreams.fromString(result.component1()!!)
                 val parsedFile = ParsedFile(charStream)
-                parsedFile.name = filePath
+                parsedFile.name = filepath
                 parsedFile
             } else {
                 null

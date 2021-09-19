@@ -31,7 +31,7 @@ internal class GithubUtilTest {
         val descriptor = "user2:master"
         val parsed = GithubUtil.parseBranchDescriptor(descriptor, GhRepo("user1", "rep"))
         assertEquals(GhRepo("user2", "rep"), parsed.repo)
-        assertEquals("master", parsed.branch)
+        assertEquals("master", parsed.sha)
     }
 
     @Test
@@ -39,7 +39,7 @@ internal class GithubUtilTest {
         val descriptor = "master"
         val parsed = GithubUtil.parseBranchDescriptor(descriptor, GhRepo("usr", "rep"))
         assertEquals(GhRepo("usr", "rep"), parsed.repo)
-        assertEquals("master", parsed.branch)
+        assertEquals("master", parsed.sha)
     }
 
     @Test
