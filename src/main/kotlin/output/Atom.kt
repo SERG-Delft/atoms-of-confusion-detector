@@ -1,5 +1,8 @@
 package output
 
+/**
+ * This is an enum class containing all possible atoms.
+ */
 enum class Atom {
     INFIX_OPERATOR_PRECEDENCE,
     POST_INCREMENT_DECREMENT,

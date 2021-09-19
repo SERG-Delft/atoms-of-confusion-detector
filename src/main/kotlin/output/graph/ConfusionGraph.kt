@@ -143,6 +143,10 @@ class ConfusionGraph(val sources: List<String>) {
     }
 }
 
+/**
+ * This is a handy data class used to represent atom appearances.
+ * Its "toList" method is particularly useful for outputting this in a CSV file using the CSVWriter class.
+ */
 data class AtomInSourceAppearance(val nameOfSource: String, val nameOfAtom: String, val lines: Set<Int>) {
     fun toList(): List<Any> {
         return listOf(nameOfAtom, nameOfSource, lines)

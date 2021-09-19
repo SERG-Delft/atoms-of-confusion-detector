@@ -14,6 +14,9 @@ class PreIncrementDecrementDetector(listener: AtomsListener, graph: ConfusionGra
 ) {
 
     override fun detect(ctx: JavaParser.ExprPrefixContext) {
-        super.analyzePostPreIncrementDecrement(ctx.parent, ctx.start.line)
+        if (ctx.prefix.text == "++" || ctx.prefix.text == "--") super.analyzePostPreIncrementDecrement(
+            ctx.parent,
+            ctx.start.line
+        )
     }
 }
