@@ -1,5 +1,6 @@
 package parsing.detectors
 
+import JavaParser
 import output.graph.ConfusionGraph
 import parsing.AtomsListener
 
@@ -11,6 +12,7 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.ExprInstanceofContext) {}
     open fun detect(ctx: JavaParser.ExprInfixBitshiftContext) {}
     open fun detect(ctx: JavaParser.ExprTernaryContext) {}
+    open fun detect(ctx: JavaParser.IntLitOctalContext) {}
     open fun detect(ctx: JavaParser.StatIfElseContext) {}
     open fun detect(ctx: JavaParser.StatForContext) {}
     open fun detect(ctx: JavaParser.StatWhileContext) {}
@@ -19,5 +21,7 @@ open class Detector(open val listener: AtomsListener, open val graph: ConfusionG
     open fun detect(ctx: JavaParser.StatExpressionContext) {}
     open fun detect(ctx: JavaParser.ExprTypeCastContext) {}
     open fun detect(ctx: JavaParser.ExprAssignmentContext) {}
-    open fun detect(ctx: JavaParser.ForControlContext) {}
+    open fun detect(ctx: JavaParser.LocalVariableDeclarationContext) {}
+    open fun detect(ctx: JavaParser.VariableDeclaratorContext) {}
+    open fun detect(ctx: JavaParser.ForCtrlStandardContext) {}
 }

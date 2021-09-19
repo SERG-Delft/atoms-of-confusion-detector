@@ -27,6 +27,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+Adaptations were made to the original grammar to better suit the atoms of confusion detection.
+**/
+
 parser grammar JavaParser;
 
 options { tokenVocab=JavaLexer; }
@@ -286,10 +290,10 @@ literal
     ;
 
 integerLiteral
-    : DECIMAL_LITERAL
-    | HEX_LITERAL
-    | OCT_LITERAL
-    | BINARY_LITERAL
+    : DECIMAL_LITERAL   #intLitDecimal
+    | HEX_LITERAL       #intLitHex
+    | OCT_LITERAL       #intLitOctal
+    | BINARY_LITERAL    #intLitBin
     ;
 
 floatLiteral
@@ -441,17 +445,13 @@ switchLabel
     ;
 
 forControl
-    : enhancedForControl
-    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList?
+    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression #forCtrlEnhanced
+    | init=forInit? ';' stopCondition=expression? ';' iterUpdate=expressionList? #forCtrlStandard
     ;
 
 forInit
     : localVariableDeclaration
     | expressionList
-    ;
-
-enhancedForControl
-    : variableModifier* type=typeType id=variableDeclaratorId ':' enumeration=expression
     ;
 
 // EXPRESSIONS

@@ -9,4 +9,5 @@ data class ParsedFile(val stream: CharStream) {
     val lex = JavaLexer(stream)
     val tokens = CommonTokenStream(lex)
     val parser = JavaParser(tokens)
+    var name: String = stream.sourceName
 }

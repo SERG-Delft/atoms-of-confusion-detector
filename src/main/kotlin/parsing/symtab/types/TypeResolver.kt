@@ -11,6 +11,12 @@ object TypeResolver {
         "float", "double", "char", "boolean"
     )
 
+    /**
+     * Convert a textual type to a Type object that can be used for scoping.
+     *
+     * @param type the textual type to convert.
+     * @returns a Type object.
+     */
     fun resolveType(type: String): Type {
         return if (primitives.contains(type)) {
             PrimitiveType(type)

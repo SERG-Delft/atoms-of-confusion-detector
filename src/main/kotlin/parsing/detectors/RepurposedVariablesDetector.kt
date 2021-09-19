@@ -4,7 +4,7 @@ import output.Atom
 import output.graph.ConfusionGraph
 import parsing.AtomsListener
 
-@Visit(JavaParser.ExprAssignmentContext::class, JavaParser.ForControlContext::class)
+@Visit(JavaParser.ExprAssignmentContext::class, JavaParser.ForCtrlStandardContext::class)
 class RepurposedVariablesDetector(listener: AtomsListener, graph: ConfusionGraph) : Detector(listener, graph) {
 
     /**
@@ -16,9 +16,9 @@ class RepurposedVariablesDetector(listener: AtomsListener, graph: ConfusionGraph
     override fun detect(ctx: JavaParser.ExprAssignmentContext) {
         val assignee = ctx.assignee.text
         val assigned = ctx.assigned.text
-        // check if the assignment is in a for loop iter update
+        // check if the assignment is in a for loop iteration update
         val grandpa = ctx.parent.parent
-        if (grandpa is JavaParser.ForControlContext) {
+        if (grandpa is JavaParser.ForCtrlStandardContext) {
             analyzeSubExpr(ctx.assignee)
         } else if (!assigned.contains(assignee)) {
             // check if variable is re-assigned to an independent value
@@ -36,7 +36,7 @@ class RepurposedVariablesDetector(listener: AtomsListener, graph: ConfusionGraph
      *
      * @param ctx the for-loop control node in the parse tree.
      */
-    override fun detect(ctx: JavaParser.ForControlContext) {
+    override fun detect(ctx: JavaParser.ForCtrlStandardContext) {
         val iterUpdate = ctx.iterUpdate
         iterUpdate.children.forEach {
             when (it) {

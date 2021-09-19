@@ -61,16 +61,37 @@ internal class PreIncrementDecrementDetectorTest : DetectorTest() {
     }
 
     @Test
-    fun testStatementDoesNotTrigger() {
+    fun testInStatement() {
         val code = "--v1"
         val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT_AS_STATEMENT")
+    }
+
+    @Test
+    fun testPostIncrementInMethodCall() {
+        val code = "method(++a)"
+        val atoms = runVisitorExpr(code)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT")
+    }
+
+    @Test
+    fun testIncrementInForLoop() {
+        val code = "class A { public void foo() { for (int i = 0; i < 10; ++i) {} } }"
+        val atoms = runVisitorFile(code)
+        assertAtom(atoms, "PRE_INCREMENT_DECREMENT_IN_FOR_LOOP")
+    }
+
+    @Test
+    fun testTildeNotDetected() {
+        val code = "class A { int a = 32; public void foo() { ~a } }"
+        val atoms = runVisitorFile(code)
         assertEquals(0, atoms.size)
     }
 
     @Test
-    fun testIncrementInForLoopDoesNotTrigger() {
-        val code = "for (int i = 0; i < 10; ++i) {}"
-        val atoms = runVisitorExpr(code)
+    fun testBangNotDetected() {
+        val code = "class A { int a = 32; public void foo() { !a } }"
+        val atoms = runVisitorFile(code)
         assertEquals(0, atoms.size)
     }
 }
