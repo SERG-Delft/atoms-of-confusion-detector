@@ -218,7 +218,7 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
 
         // download all of the from files
         fileNames.forEach { filePath ->
-            val downloadedFile = GithubUtil.downloadFile(commit, filePath)
+            val downloadedFile = GithubUtil.downloadAndParseFile(commit, filePath)
             if (downloadedFile != null) {
                 if (Settings.DOWNLOAD) {
                     File("$resultsDir/${toOrFrom}Files").mkdir()

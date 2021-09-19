@@ -28,11 +28,13 @@ internal class PRDeltaTest {
         targetGraph.addAppearancesOfAtom(Atom.INDENTATION, "F1.java", mutableSetOf(32))
         targetGraph.addAppearancesOfAtom(Atom.INDENTATION, "F2.java", mutableSetOf(42, 75))
         targetGraph.addAppearancesOfAtom(Atom.TYPE_CONVERSION, "F2.java", mutableSetOf(20))
+
+        every { }
         every { diffParser.removedLinesForFile("F1.java") } returns mutableSetOf(20)
         every { diffParser.addedLinesForFile("F1.java") } returns mutableSetOf()
         every { diffParser.addedLinesForFile("F2.java") } returns mutableSetOf(20, 70, 71, 75, 120)
         every { diffParser.removedLinesForFile("F2.java") } returns mutableSetOf(20, 70, 71, 75, 120)
-        prDelta = PRDelta(sourceGraph, targetGraph, listOf(parsedF1, parsedF2), listOf(parsedF1, parsedF2), diffParser)
+        prDelta = PRDelta(sourceGraph, targetGraph, sources, sources, diffParser)
     }
 
     @Test
