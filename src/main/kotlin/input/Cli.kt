@@ -1,5 +1,3 @@
-@file:Suppress("MaximumLineLength")
-
 package input
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -44,12 +42,26 @@ class Tool : CliktCommand(help = "Analyze Java source code for the presence of a
         "-d", "--disabled", help = "Space separated list of disabled atoms"
     ).multiple()
 
+    private val verboseFlag by option(
+        "-v", "--verbose", "-V",
+        help = "Print the results of its analysis on the console"
+    ).flag(default = Settings.VERBOSE)
+
+    private val logFlag by option(
+        "-l", "--log", "-L",
+        help = "Save the progress of the analysis to a log file"
+    ).flag(default = Settings.LOG)
+
     override fun run() {
 
         // disable provided atoms
         disabledAtoms.forEach {
             Settings.enabledAtoms[it] = false
         }
+
+        // set flags
+        Settings.LOG = logFlag
+        Settings.VERBOSE = verboseFlag
     }
 }
 
@@ -140,21 +152,11 @@ class FilesCommand : AtomsCommand("Analyze the provided files for atoms of confu
 
     private val recursiveFlag by option(
         "-r", "--recursive", "-R",
-        help = "This flag tells the tool to recursively search any input directory for Java files"
+        help = "Recursively search any input directory for Java files"
     ).flag(default = Settings.RECURSIVELY_SEARCH_DIRECTORIES)
 
-    private val verboseFlag by option(
-        "-v", "--verbose", "-V",
-        help = "This flag tells the tool to print the results of its analysis on the console"
-    ).flag(default = Settings.VERBOSE)
-
-    private val logFlag by option(
-        "-l", "--log", "-L",
-        help = "This flag tells the tool to log the progress of the analysis to a file"
-    ).flag(default = Settings.LOG)
-
     // the file paths to be read
-    private val inputFiles: List<Path> by argument()
+    private val files: List<Path> by argument(help = "Space separated list of files/directories to analyze")
         .path(mustExist = true, mustBeReadable = true)
         .multiple(required = true)
 
@@ -162,12 +164,10 @@ class FilesCommand : AtomsCommand("Analyze the provided files for atoms of confu
 
         // save cli settings
         Settings.RECURSIVELY_SEARCH_DIRECTORIES = recursiveFlag
-        Settings.VERBOSE = verboseFlag
-        Settings.LOG = logFlag
 
         val fileResolver = InputParser()
 
-        inputFiles.forEach { path ->
+        files.forEach { path ->
             fileResolver.resolveFile(path.toFile())
         }
 
@@ -188,20 +188,15 @@ class FilesCommand : AtomsCommand("Analyze the provided files for atoms of confu
 @Suppress("NestedBlockDepth")
 class PRCommand : AtomsCommand("Analyze the provided github pull request for atoms of confusion") {
 
-    private val verboseFlag by option(
-        "-v", "--verbose", "-V",
-        help = "This flag tells the tool to print the results of its analysis on the console"
-    ).flag(default = Settings.VERBOSE)
-
-    private val logFlag by option(
-        "-l", "--log", "-L",
-        help = "This flag tells the tool to log the progress of the analysis to a file"
-    ).flag(default = Settings.LOG)
-
     private val downloadFlag by option(
         "-dl", "--download", "-DL",
         help = "Download all of the affected files in the pull request both before and after the merge"
     ).flag(default = Settings.LOG)
+
+    private val token by option(
+        "-t", "--token",
+        help = "Github API key you can obtain one at https://github.com/settings/tokens"
+    )
 
     private val url: String by argument(help = "The github pr URL")
 
@@ -240,9 +235,8 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
     override fun run() {
 
         // set flags
-        Settings.VERBOSE = verboseFlag
-        Settings.LOG = logFlag
         Settings.DOWNLOAD = downloadFlag
+        Settings.TOKEN = token
 
         // create results directory
         val resultsDir = "./atoms-of-confusion-results"

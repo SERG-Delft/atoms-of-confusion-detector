@@ -4,6 +4,8 @@ import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.httpGet
 import github.exceptions.InvalidPrUrlException
 import github.exceptions.NonexistentPRException
+import github.exceptions.UsageLimitException
+import input.Settings
 import org.antlr.v4.runtime.CharStreams
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -27,9 +29,18 @@ sealed class GithubUtil {
             val (userName, repoName, number) = parseUrl(url)
             val repo = GhRepo(userName, repoName)
 
-            // TODO check for invalid url and rate limit
-            val apiUrl = "http://api.github.com/repos/${repo.user}/${repo.name}/pulls/$number"
-            val (_, _, result) = apiUrl.httpGet().responseString()
+            // create request
+            val request = "http://api.github.com/repos/${repo.user}/${repo.name}/pulls/$number".httpGet()
+
+            // add auth header if provided
+            if (Settings.TOKEN != null) request.appendHeader("authorization" to "token ${Settings.TOKEN}")
+
+            // send request
+            val (_, response, result) = request.responseString()
+
+            if (response.statusCode == 403) throw UsageLimitException()
+            if (!response.isSuccessful) throw NonexistentPRException(url)
+
             val json = JSONParser().parse(result.component1()) as JSONObject
 
             val toCommit = createCommitDescriptor(json["head"] as JSONObject, repo)

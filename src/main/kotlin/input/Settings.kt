@@ -20,6 +20,9 @@ object Settings {
     // controls if the tool downloads files
     var DOWNLOAD = false
 
+    // the optional API token
+    var TOKEN: String? = null
+
     val enabledAtoms = mutableMapOf(
         "INFIX_OPERATOR_PRECEDENCE" to true,
         "PRE_INCREMENT_DECREMENT" to true,

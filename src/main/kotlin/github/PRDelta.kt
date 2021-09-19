@@ -20,7 +20,7 @@ class PRDelta(
 
     init {
 
-        // for each toAtom, check if it is newly added or remaining from before
+        // for each atom in the target, check if it is newly added or remaining from before
         for (file in toFiles) {
             val atomsInFile = toGraph.findAtomsInSource(file)
             for (atom in atomsInFile) {
@@ -34,7 +34,7 @@ class PRDelta(
             }
         }
 
-        // for each fromAtom, check if it is removed
+        // for each atom in the source, check if it is removed
         for (file in fromFiles) {
             val atomsInFile = fromGraph.findAtomsInSource(file)
             for (atom in atomsInFile) {
