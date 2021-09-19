@@ -3,7 +3,82 @@
 This is a tool for detecting atoms of confusion in the Java language as showcased in
 this [paper](https://arxiv.org/pdf/2103.05424.pdf) by Langhout and Aniche.
 
-## How to use
+## Usage
+
+```
+Usage: tool [OPTIONS] COMMAND [ARGS]...
+
+  Analyze Java source code for the presence of atoms of confusion
+
+Options:
+  -d, --disabled TEXT  Space separated list of disabled atoms
+  -v, -V, --verbose    Print the results of its analysis on the console
+  -l, -L, --log        Save the progress of the analysis to a log file
+  -h, --help           Show this message and exit
+
+Commands:
+  files  Analyze the provided files for atoms of confusion
+  pr     Analyze the provided github pull request for atoms of confusion
+```
+
+### Running the detector on files
+
+```
+Usage: tool files [OPTIONS] FILES...
+
+  Analyze the provided files for atoms of confusion
+
+Options:
+  -r, -R, --recursive  Recursively search any input directory for Java files
+  -h, --help           Show this message and exit
+
+Arguments:
+  FILES  Space separated list of files/directories to analyzej
+
+```
+
+For example:
+
+```shell
+# run the detector on File1.java, File2.java and all of the files in dir
+tool files -r File1.java File2.java ./dir/
+```
+
+### Running the detector on a GitHub pull request
+
+```
+Usage: tool pr [OPTIONS] URL
+
+  Analyze the provided github pull request for atoms of confusion
+
+Options:
+  -dl, -DL, --download  Download all of the affected files in the pull request
+                        both before and after the merge
+  -t, --token TEXT      Github API key you can obtain one at
+                        https://github.com/settings/tokens
+  -h, --help            Show this message and exit
+
+Arguments:
+  URL  The github pr URL
+
+```
+
+For example:
+
+```shell
+# analyze pull request 1926 of the mockito project
+tool pr https://github.com/mockito/mockito/pull/1926
+```
+
+```shell
+# you can provide a token, this will allow you to do 5000 runs per hour rather than 60
+tool pr --token <token> <url>
+```
+
+```shell
+# assing the -dl flag will download the analyzed files both before and after, to make manually finding the detected atoms simpler
+tool pr -dl <url>
+```
 
 ## Implementation
 
@@ -12,18 +87,24 @@ feel free to also check the documentation of the classes and the methods in the 
 
 ### Input
 
-The tool accepts user commands through the command line. To parse this commands we have used
-the [CLIKT](https://ajalt.github.io/clikt/) library.
+The tool is a CLI tool. To parse CLI arguments the [CLIKT](https://ajalt.github.io/clikt/) library is used. You can run
+the tool on local files or alternatively, you can pass a github pull request and anlyze the code both before and after
+the merge. All of the CLI logic is implemented in the file `Cli.kt`.
 
-For the actual input, i.e the source code to be analysed, the tool can either use local files and directories or get it
-from GitHub Pull Requests.
+### Running the detector on files
 
-In terms of code the different sources of input are encoded by the classes found in the `InputSource.kt` file under
-the `input` package. In the same package you can find the `InputParser` class which is used to parse individual files
-and also all files in a directory (recursively). In that package you can also find all the classes responsible for the
-parsing of the command line arguments.
+When running the detector on files, the `InputParser` class is responsible for retreiving the individual files
+provided by the user and parsing them. Next the detector is ran and the results are provided to the user.
 
-#### Resolving Pull Requests
+#### Running the detector on pull requests
+
+In order to run the tool on pull requests, the github API is used to find the commit SHA for the code before and after
+applying the PR. Next, `.diff` file for the PR is downloaded and parsed to get the affected filenames before and after
+the merge, as well as the ranges of line numbers which are added/deleted. Lastly, the before and after files are
+downloaded and the detector executes on them. This produces two sets of atoms. Now, for each atom in the before set with
+a line number which is "removed" we mark this atom as being removed in the PR. Likewise for each atom in the after set
+with a line number which is "added" the atom is marked as "added" in the PR. All remaining atoms in the after set are
+those which remain.
 
 ### Analysis
 
@@ -86,5 +167,5 @@ under the aforementioned package.
 #### Writing the output
 
 Finally, to write the output to CSV files we have used the [kotlin-csv](https://github.com/doyaaaaaken/kotlin-csv)
-library to implement the `CsvWriter` which provides methods for writing both the csv graph and the PRDelta to CSV files.
-The code for this class can be found in the `output.writers` package. 
+library to implement the `CsvWriter` which provides methods for writing both the csv graph and the PRDelta to CSV files. 
+The code for this class can be found in the `output.writers` package.
