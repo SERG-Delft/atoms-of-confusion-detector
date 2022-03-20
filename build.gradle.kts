@@ -1,10 +1,12 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     kotlin("jvm") version "1.5.10"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("io.gitlab.arturbosch.detekt") version "1.17.1"
+    id("com.github.johnrengelman.shadow") version "4.0.4"
     jacoco
 }
 
@@ -31,6 +33,23 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.1")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.6.1")
+}
+
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("shadow")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to "MainKt"))
+        }
+    }
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
 }
 
 tasks.test {
