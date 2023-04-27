@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.httpGet
 import github.exceptions.InvalidPrUrlException
 import github.exceptions.NonexistentPRException
+import github.exceptions.InvalidCommitUrlException
 import github.exceptions.UsageLimitException
 import input.Settings
 import org.antlr.v4.runtime.CharStreams
@@ -43,7 +44,10 @@ sealed class GithubUtil {
 
             val json = JSONParser().parse(result.component1()) as JSONObject
 
-            val toCommit = createCommitDescriptor(json["head"] as JSONObject, repo)
+            var toCommit = createCommitDescriptor(json["head"] as JSONObject, repo)
+            if (!validateCommitDescriptor(toCommit)){
+                toCommit = createCommitDescriptor(json["head"] as JSONObject, repo, true)
+            }
             val fromCommit = createCommitDescriptor(json["base"] as JSONObject, repo)
 
             // download diff file
@@ -78,14 +82,15 @@ sealed class GithubUtil {
          *
          * @param json the json object, head or base
          * @param repo the name of the repository this PR belongs to
+         * @param useBaseRepo enforce the use of main repo for the base commit
          * @return a pair containing the target repo and target branch
          */
-        private fun createCommitDescriptor(json: JSONObject, repo: GhRepo): GhCommitData {
+        private fun createCommitDescriptor(json: JSONObject, repo: GhRepo, useBaseRepo: Boolean = false): GhCommitData {
 
             val label = json["label"].toString()
             val sha = json["sha"].toString()
 
-            return if (label.contains(":")) {
+            return if (label.contains(":") && !useBaseRepo) {
                 // if the ":" is present the parent repo is different
                 val split = label.split(":")
                 GhCommitData(GhRepo(split[0], repo.name), sha)
@@ -93,6 +98,17 @@ sealed class GithubUtil {
                 // if the ":" is not present the parent repo is the one that the PR belongs to
                 GhCommitData(repo, sha)
             }
+        }
+        /**
+         * validate a github commit descriptor to see if it exists
+         *
+         * @param commit the GhCommitData object
+         * @return boolean that indicates whether it is valid
+         */
+        private fun validateCommitDescriptor(commit:GhCommitData): Boolean {
+            val url = "http://raw.githubusercontent.com/${commit.repo.user}/${commit.repo.name}/${commit.sha}"
+            val (_, response, _) = url.httpGet().responseString()
+            return response.isSuccessful
         }
 
         /**
@@ -137,7 +153,7 @@ sealed class GithubUtil {
                 parsedFile.name = filepath
                 parsedFile
             } else {
-                null
+                throw InvalidCommitUrlException(url)
             }
         }
     }
