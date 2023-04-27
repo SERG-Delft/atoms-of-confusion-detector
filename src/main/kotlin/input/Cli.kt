@@ -11,6 +11,7 @@ import github.DiffParser
 import github.GhCommitData
 import github.GithubUtil
 import github.PRDelta
+import github.exceptions.InvalidCommitUrlException
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import output.graph.ConfusionGraph
 import output.writers.CsvWriter
@@ -251,18 +252,22 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         // get the filenames of the .java files that were modified in the pr
         val fromFiles = parsedDiff.fromFileNames.filter { it.endsWith(".java") }
         val toFiles = parsedDiff.toFileNames.filter { it.endsWith(".java") }
+        try{
+            val fromGraph = runDetector(fromFiles, pr.fromCommit, resultsDir, "from")
+            val toGraph = runDetector(toFiles, pr.toCommit, resultsDir, "to")
 
-        val fromGraph = runDetector(fromFiles, pr.fromCommit, resultsDir, "from")
-        val toGraph = runDetector(toFiles, pr.toCommit, resultsDir, "to")
+            // output the to and from atoms
+            CsvWriter.outputData(fromGraph, "$resultsDir/fromAtoms.csv")
+            CsvWriter.outputData(toGraph, "$resultsDir/toAtoms.csv")
 
-        // output the to and from atoms
-        CsvWriter.outputData(fromGraph, "$resultsDir/fromAtoms.csv")
-        CsvWriter.outputData(toGraph, "$resultsDir/toAtoms.csv")
+            // compute the pr delta
+            val delta = PRDelta(toGraph, fromGraph, toFiles, fromFiles, parsedDiff)
 
-        // compute the pr delta
-        val delta = PRDelta(toGraph, fromGraph, toFiles, fromFiles, parsedDiff)
+            // output the pr delta
+            CsvWriter.outputData(delta, "${pr.repo.user}-${pr.repo.name}-${pr.number}", resultsDir)
+        }catch (e:InvalidCommitUrlException){
+            println("Invalid Commit URL error:${e.message}\n")
+        }
 
-        // output the pr delta
-        CsvWriter.outputData(delta, "${pr.repo.user}-${pr.repo.name}-${pr.number}", resultsDir)
     }
 }
