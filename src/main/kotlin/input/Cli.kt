@@ -251,7 +251,6 @@ class PRCommand : AtomsCommand("Analyze the provided github pull request for ato
         // get the filenames of the .java files that were modified in the pr
         val fromFiles = parsedDiff.fromFileNames.filter { it.endsWith(".java") }
         val toFiles = parsedDiff.toFileNames.filter { it.endsWith(".java") }
-
         val fromGraph = runDetector(fromFiles, pr.fromCommit, resultsDir, "from")
         val toGraph = runDetector(toFiles, pr.toCommit, resultsDir, "to")
 
