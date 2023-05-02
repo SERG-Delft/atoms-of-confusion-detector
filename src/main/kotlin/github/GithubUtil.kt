@@ -6,11 +6,11 @@ import github.exceptions.InvalidPrUrlException
 import github.exceptions.NonexistentPRException
 import github.exceptions.UsageLimitException
 import input.Settings
-import java.net.URI
 import org.antlr.v4.runtime.CharStreams
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import parsing.ParsedFile
+import java.net.URI
 
 // for now its like this until a proper error handling system is in place
 @SuppressWarnings("RethrowCaughtException", "ThrowsCount", "MagicNumber")
