@@ -10,7 +10,10 @@ class IndentationDetector(listener: AtomsListener, graph: ConfusionGraph) : Dete
 
     override fun detect(ctx: JavaParser.StatIfElseContext) {
         checkNextSiblingHasSameIndentation(ctx)
-        val startingIndentOfIf = ctx.IF().symbol.charPositionInLine
+        var startingIndentOfIf = ctx.IF().symbol.charPositionInLine
+        if (ctx.parent is JavaParser.StatIfElseContext) {
+            startingIndentOfIf = (ctx.parent as JavaParser.StatIfElseContext).ifBody.stop.charPositionInLine
+        }
         if (ctx.ifBody is JavaParser.StatBlockContext) {
             val closingBracket = (ctx.ifBody as JavaParser.StatBlockContext).block().RBRACE().symbol
             val indentOfClosingBracket =
